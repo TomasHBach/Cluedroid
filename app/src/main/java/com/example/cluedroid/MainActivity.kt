@@ -5,15 +5,24 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
@@ -36,20 +45,21 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cluedroid.ui.theme.CluedroidTheme
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -76,7 +86,7 @@ fun CluedroidMain(modifier: Modifier = Modifier) {
     val tabIconsNotSelected = listOf(Icons.Outlined.Home, Icons.Outlined.Face)
     val tabs = listOf(HideTab(), SuspectsTab())
 
-    val pagerState = rememberPagerState( pageCount = { tabs.size } )
+    val pagerState = rememberPagerState(pageCount = { tabs.size })
     val coroutineScope = rememberCoroutineScope()
 
     Column(
@@ -130,7 +140,7 @@ fun CluedroidMain(modifier: Modifier = Modifier) {
                         )
                     },
                     selected = pagerState.currentPage == it,
-                    onClick = { coroutineScope.launch { pagerState.animateScrollToPage(it) }})
+                    onClick = { coroutineScope.launch { pagerState.animateScrollToPage(it) } })
             }
         }
     }
@@ -183,17 +193,82 @@ fun HideTab(modifier: Modifier = Modifier) {
 fun SuspectsTab(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
-            .verticalScroll(rememberScrollState())
     ) {
-        repeat(10) {
-            Text(text = "Elemento $it")
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(10.dp)
+                .clip(RoundedCornerShape(corner = CornerSize(10)))
+                .background(Color.LightGray),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.Start,
+        ) {
+
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 15.dp, bottom = 20.dp),
+                text = "Suspects",
+                textAlign = TextAlign.Center,
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Transparent)
+                    .padding(bottom = 15.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.Start,
+            ) {
+                repeat(20) {
+                    ListItem(itemText = "Item $it")
+                }
+            }
+
         }
     }
 }
 
+@Composable
+fun ListItem(modifier: Modifier = Modifier, itemText: String) {
+    var textColor by remember { mutableStateOf(Color.Black) }
+    var textDecoration by remember { mutableStateOf(TextDecoration.None) }
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(35.dp)
+            .padding(bottom = 5.dp, start = 5.dp, end = 5.dp)
+            .background(Color.Yellow)
+            .clickable {
+                if (textColor == Color.Black) {
+                    textColor = Color.Yellow
+                    textDecoration = TextDecoration.LineThrough
+                } else {
+                    textColor = Color.Black
+                    textDecoration = TextDecoration.None
+                }
+            }
+            .clip(shape = RoundedCornerShape(10)),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth(),
+            text = itemText,
+            color = textColor,
+            textDecoration = textDecoration,
+            fontSize = 18.sp
+        )
+    }
+
+}
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun CluedroidPreview() {
     CluedroidTheme {
         CluedroidMain()
     }
