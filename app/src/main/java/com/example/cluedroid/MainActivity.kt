@@ -6,8 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -25,10 +22,6 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.outlined.Face
-import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
@@ -53,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -81,10 +75,20 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CluedroidMain(modifier: Modifier = Modifier) {
-    val tabTitles = listOf("Hide", "Suspects")
-    val tabIconsSelected = listOf(Icons.Filled.Home, Icons.Filled.Face)
-    val tabIconsNotSelected = listOf(Icons.Outlined.Home, Icons.Outlined.Face)
-    val tabs = listOf(HideTab(), SuspectsTab())
+    val tabTitles = listOf("Hide", "Suspects", "Weapons", "Rooms")
+    val tabIconsSelected = listOf(
+        painterResource(id = R.drawable.baseline_home_24),
+        painterResource(id = R.drawable.baseline_person_search_24),
+        painterResource(id = R.drawable.baseline_hardware_24),
+        painterResource(id = R.drawable.baseline_meeting_room_24)
+    )
+    val tabIconsNotSelected = listOf(
+        painterResource(id = R.drawable.outline_home_24),
+        painterResource(id = R.drawable.outline_person_search_24),
+        painterResource(id = R.drawable.outline_hardware_24),
+        painterResource(id = R.drawable.outline_meeting_room_24)
+    )
+    val tabs = listOf(HideTab(), SuspectsTab(), WeaponsTab(), RoomsTab())
 
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     val coroutineScope = rememberCoroutineScope()
@@ -116,6 +120,18 @@ fun CluedroidMain(modifier: Modifier = Modifier) {
                         .weight(0.9f)
                         .fillMaxSize()
                 )
+
+                2 -> WeaponsTab(
+                    Modifier
+                        .weight(0.9f)
+                        .fillMaxSize()
+                )
+
+                3 -> RoomsTab(
+                    Modifier
+                        .weight(0.9f)
+                        .fillMaxSize()
+                )
             }
         }
 
@@ -135,7 +151,7 @@ fun CluedroidMain(modifier: Modifier = Modifier) {
                 Tab(text = { Text(tabTitles[it]) },
                     icon = {
                         Icon(
-                            if (pagerState.currentPage == it) tabIconsSelected[it] else tabIconsNotSelected[it],
+                            painter = (if (pagerState.currentPage == it) tabIconsSelected[it] else tabIconsNotSelected[it]),
                             contentDescription = null
                         )
                     },
@@ -191,6 +207,54 @@ fun HideTab(modifier: Modifier = Modifier) {
 
 @Composable
 fun SuspectsTab(modifier: Modifier = Modifier) {
+    ListTab(
+        modifier = modifier,
+        items = listOf(
+            "Mrs. White",
+            "Mr. Green",
+            "Mrs. Peacock",
+            "Professor Plum",
+            "Miss Scarlet",
+            "Colonel Mustard"
+        )
+    )
+}
+
+@Composable
+fun WeaponsTab(modifier: Modifier = Modifier) {
+    ListTab(
+        modifier = modifier,
+        items = listOf(
+            "Candlestick",
+            "Dagger",
+            "Lead Pipe",
+            "Revolver",
+            "Rope",
+            "Wrench"
+        )
+    )
+}
+
+@Composable
+fun RoomsTab(modifier: Modifier = Modifier) {
+    ListTab(
+        modifier = modifier,
+        items = listOf(
+            "Ballroom",
+            "Billiard Room",
+            "Conservatory",
+            "Dining Room",
+            "Hall",
+            "Kitchen",
+            "Lounge",
+            "Library",
+            "Study"
+        )
+    )
+}
+
+@Composable
+fun ListTab(modifier: Modifier = Modifier, items: List<String>) {
     Column(
         modifier = modifier
     ) {
@@ -223,11 +287,10 @@ fun SuspectsTab(modifier: Modifier = Modifier) {
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start,
             ) {
-                repeat(20) {
-                    ListItem(itemText = "Item $it")
+                repeat(items.size) {
+                    ListItem(itemText = items[it])
                 }
             }
-
         }
     }
 }
@@ -266,6 +329,7 @@ fun ListItem(modifier: Modifier = Modifier, itemText: String) {
     }
 
 }
+
 @Preview(showBackground = true)
 @Composable
 fun CluedroidPreview() {
