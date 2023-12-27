@@ -111,25 +111,21 @@ fun CluedroidMain(modifier: Modifier = Modifier) {
             when (page) {
                 0 -> HideTab(
                     Modifier
-                        .weight(0.9f)
                         .fillMaxSize()
                 )
 
                 1 -> SuspectsTab(
                     Modifier
-                        .weight(0.9f)
                         .fillMaxSize()
                 )
 
                 2 -> WeaponsTab(
                     Modifier
-                        .weight(0.9f)
                         .fillMaxSize()
                 )
 
                 3 -> RoomsTab(
                     Modifier
-                        .weight(0.9f)
                         .fillMaxSize()
                 )
             }
@@ -137,14 +133,14 @@ fun CluedroidMain(modifier: Modifier = Modifier) {
 
         TabRow(
             selectedTabIndex = pagerState.currentPage,
-            indicator = { tabPositions ->
+            indicator = {
                 TabRowDefaults.Indicator(
                     Modifier.size(0.dp),
                     color = Color.Transparent,
                 )
             },
             modifier = Modifier
-                .weight(0.1f)
+                .weight(0.09f)
                 .fillMaxWidth()
         ) {
             repeat(tabTitles.size) {
