@@ -40,7 +40,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.4.1"
     }
     packaging {
         resources {
@@ -91,5 +91,9 @@ dependencies {
 
     // optional - Paging 3 Integration
     implementation("androidx.room:room-paging:$room_version")
+
+
+    //HiltViewModel
+    implementation("androidx.hilt:hilt-navigation-fragment:1.0.0")
 
 }

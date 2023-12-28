@@ -17,7 +17,7 @@ abstract class TemplateRoomDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: TemplateRoomDatabase? = null
 
-        fun getInstance(context: Context): TemplateRoomDatabase {
+        suspend fun getInstance(context: Context): TemplateRoomDatabase? {
             var instance = INSTANCE
 
             if (instance == null) {
@@ -29,8 +29,17 @@ abstract class TemplateRoomDatabase : RoomDatabase() {
                     .build()
 
                 INSTANCE = instance
+                INSTANCE!!.populateInitialData()
+
             }
-            return instance
+            return INSTANCE
         }
     }
+
+    suspend fun populateInitialData() {
+        if (templateDao().getAllTemplates().size == 0) {
+            templateDao().addTemplate(template = Template(1, "Titulo 1", "asd", "asd", "asdas"))
+        }
+    }
+
 }

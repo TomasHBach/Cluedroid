@@ -3,6 +3,7 @@ package com.example.cluedroid
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -55,8 +56,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cluedroid.ui.theme.CluedroidTheme
 import kotlinx.coroutines.launch
+import com.example.cluedroid.View.AppViewModel as AppViewModel
 
 class MainActivity : ComponentActivity() {
+    private val appViewModel: AppViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -65,7 +68,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    CluedroidMain()
+                    CluedroidMain(appViewModel = appViewModel)
                 }
             }
         }
@@ -74,7 +77,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CluedroidMain(modifier: Modifier = Modifier) {
+fun CluedroidMain(modifier: Modifier = Modifier, appViewModel: AppViewModel? = null) {
     val tabTitles = listOf("Hide", "Suspects", "Weapons", "Rooms")
     val tabIconsSelected = listOf(
         painterResource(id = R.drawable.baseline_home_24),
@@ -333,3 +336,5 @@ fun CluedroidPreview() {
         CluedroidMain()
     }
 }
+
+
