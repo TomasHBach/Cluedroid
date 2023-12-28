@@ -78,7 +78,12 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CluedroidMain(modifier: Modifier = Modifier, appViewModel: AppViewModel? = null) {
-    val tabTitles = listOf("Hide", "Suspects", "Weapons", "Rooms")
+    var test = "1"
+    if (appViewModel != null) {
+        test = appViewModel.getTemplateById("1").name
+    }
+
+    val tabTitles = listOf(test, "Suspects", "Weapons", "Rooms")
     val tabIconsSelected = listOf(
         painterResource(id = R.drawable.baseline_home_24),
         painterResource(id = R.drawable.baseline_person_search_24),

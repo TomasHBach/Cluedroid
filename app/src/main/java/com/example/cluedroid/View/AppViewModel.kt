@@ -15,6 +15,10 @@ class AppViewModel @Inject constructor(private val templateRepository: TemplateR
 
     val foundTemplate: LiveData<Template> = templateRepository.foundTemplate
 
+    fun getTemplateById(id: String): Template {
+        return templateRepository.getTemplateById(id)
+    }
+
     fun getAllTemplates() {
         templateRepository.allTemplates
     }
