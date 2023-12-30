@@ -1,10 +1,8 @@
 package com.example.cluedroid
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,7 +25,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -57,21 +54,13 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.LifecycleCoroutineScope
-import androidx.lifecycle.liveData
-import androidx.room.paging.util.queryDatabase
 import com.example.cluedroid.DB.TemplateRoomDatabase
 import com.example.cluedroid.Repository.TemplateRepository
 import com.example.cluedroid.View.AppViewModel
-import com.example.cluedroid.View.AppViewModelFactory
-import com.example.cluedroid.model.Template
 import com.example.cluedroid.ui.theme.CluedroidTheme
-import hilt_aggregated_deps._dagger_hilt_android_internal_lifecycle_DefaultViewModelFactories_FragmentEntryPoint
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    val database = TemplateRoomDatabase.getInstance(this)
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -92,6 +81,12 @@ class MainActivity : ComponentActivity() {
 fun CluedroidMain(
     modifier: Modifier = Modifier
 ) {
+    val viewModel = AppViewModel(TemplateRepository(TemplateRoomDatabase.getInstance(LocalContext.current).templateDao()))
+    val template = viewModel.findTemplateById(0)
+    var suspects: List<String>? = null
+    if (template != null) {
+        suspects = template.suspects.trim().splitToSequence(';').filter { it.isNotEmpty() }.toList()
+    }
 
     val tabTitles = listOf("Hide", "Suspects", "Weapons", "Rooms")
     val tabIconsSelected = listOf(
@@ -133,9 +128,10 @@ fun CluedroidMain(
                 )
 
                 1 -> SuspectsTab(
-                    Modifier
-                        .fillMaxSize()
-                )
+                        Modifier
+                            .fillMaxSize(),
+                        suspectList = suspects
+                    )
 
                 2 -> WeaponsTab(
                     Modifier
@@ -220,23 +216,10 @@ fun HideTab(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun SuspectsTab(modifier: Modifier = Modifier) {
-    val viewModel = AppViewModel(TemplateRepository(TemplateRoomDatabase.getInstance(LocalContext.current).templateDao()))
-    Button(onClick = {
-        viewModel.addTemplate(Template(10, "t1", "asd", "asd", "asd"))
-    }) {
-        
-    }
+fun SuspectsTab(modifier: Modifier = Modifier, suspectList: List<String>? = listOf("Empty")) {
     ListTab(
         modifier = modifier,
-        items = listOf(
-            "Mrs. White",
-            "Mr. Green",
-            "Mrs. Peacock",
-            "Professor Plum",
-            "Miss Scarlet",
-            "Colonel Mustard"
-        )
+        items = suspectList ?: listOf("Empty")
     )
 }
 

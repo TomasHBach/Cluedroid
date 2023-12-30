@@ -14,6 +14,14 @@ class TemplateRepository(private val templateDao: TemplateDao) {
     val foundTemplate = MutableLiveData<Template>()
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
+    fun findTemplateById(id: Int): Template? {
+        var template: Template? = null
+        coroutineScope.launch {
+            template = templateDao.findTemplateById(id.toString())
+        }
+        return template
+    }
+
     fun addTemplate(newTemplate: Template) {
         coroutineScope.launch(Dispatchers.IO) {
             templateDao.addTemplate(newTemplate)

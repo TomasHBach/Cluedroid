@@ -6,7 +6,6 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.cluedroid.dao.TemplateDao
 import com.example.cluedroid.model.Template
-import kotlinx.coroutines.newSingleThreadContext
 
 @Database(entities = [(Template::class)], version = 1, exportSchema = true)
 abstract class TemplateRoomDatabase : RoomDatabase() {
@@ -24,7 +23,7 @@ abstract class TemplateRoomDatabase : RoomDatabase() {
                         context.applicationContext,
                         TemplateRoomDatabase::class.java,
                         "template_database"
-                    ).createFromAsset("database/test.db")
+                    ).createFromAsset("database/default_data.db")
                         .allowMainThreadQueries()
                         .build()
                     INSTANCE = instance
