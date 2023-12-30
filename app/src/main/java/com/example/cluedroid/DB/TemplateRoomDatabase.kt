@@ -8,7 +8,7 @@ import com.example.cluedroid.dao.TemplateDao
 import com.example.cluedroid.model.Template
 import kotlinx.coroutines.newSingleThreadContext
 
-@Database(entities = [(Template::class)], version = 1, exportSchema = false)
+@Database(entities = [(Template::class)], version = 1, exportSchema = true)
 abstract class TemplateRoomDatabase : RoomDatabase() {
     abstract fun templateDao(): TemplateDao
 
@@ -17,28 +17,20 @@ abstract class TemplateRoomDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: TemplateRoomDatabase? = null
 
-        suspend fun getInstance(context: Context): TemplateRoomDatabase? {
-            var instance = INSTANCE
-
-            if (instance == null) {
-                instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    TemplateRoomDatabase::class.java,
-                    "template_database"
-                ).fallbackToDestructiveMigration()
-                    .build()
-
-                INSTANCE = instance
-                INSTANCE!!.populateInitialData()
-
+        fun getInstance(context: Context): TemplateRoomDatabase {
+            synchronized(this) {
+                return INSTANCE?: synchronized(this) {
+                    val instance = Room.databaseBuilder(
+                        context.applicationContext,
+                        TemplateRoomDatabase::class.java,
+                        "template_database"
+                    ).createFromAsset("database/test.db")
+                        .allowMainThreadQueries()
+                        .build()
+                    INSTANCE = instance
+                    instance
+                }
             }
-            return INSTANCE
-        }
-    }
-
-    suspend fun populateInitialData() {
-        if (templateDao().getAllTemplates().size == 0) {
-            templateDao().addTemplate(template = Template(1, "Titulo 1", "asd", "asd", "asdas"))
         }
     }
 

@@ -11,7 +11,7 @@ import com.example.cluedroid.model.Template
 @Dao
 interface TemplateDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addTemplate(template: Template)
 
     @Query("SELECT * FROM template WHERE template.id = :templateId")

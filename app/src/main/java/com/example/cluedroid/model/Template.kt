@@ -1,18 +1,15 @@
 package com.example.cluedroid.model
 
-import androidx.annotation.NonNull
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import org.jetbrains.annotations.NonNls
 
 @Entity (tableName = "template")
 data class Template(
 
-    @PrimaryKey
-    @NonNull
+    @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    var id: Int,
+    var id: Int = 0,
 
     @ColumnInfo(name = "name")
     var name:String,

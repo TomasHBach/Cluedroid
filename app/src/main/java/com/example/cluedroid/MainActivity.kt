@@ -1,5 +1,6 @@
 package com.example.cluedroid
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -26,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -54,13 +57,23 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.lifecycle.liveData
+import androidx.room.paging.util.queryDatabase
+import com.example.cluedroid.DB.TemplateRoomDatabase
+import com.example.cluedroid.Repository.TemplateRepository
+import com.example.cluedroid.View.AppViewModel
+import com.example.cluedroid.View.AppViewModelFactory
+import com.example.cluedroid.model.Template
 import com.example.cluedroid.ui.theme.CluedroidTheme
+import hilt_aggregated_deps._dagger_hilt_android_internal_lifecycle_DefaultViewModelFactories_FragmentEntryPoint
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import com.example.cluedroid.View.AppViewModel as AppViewModel
 
 class MainActivity : ComponentActivity() {
-    private val appViewModel: AppViewModel by viewModels()
+    val database = TemplateRoomDatabase.getInstance(this)
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContent {
             CluedroidTheme {
@@ -68,22 +81,19 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    CluedroidMain(appViewModel = appViewModel)
+                    CluedroidMain()
                 }
             }
         }
     }
 }
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CluedroidMain(modifier: Modifier = Modifier, appViewModel: AppViewModel? = null) {
-    var test = "1"
-    if (appViewModel != null) {
-        test = appViewModel.getTemplateById("1").name
-    }
+fun CluedroidMain(
+    modifier: Modifier = Modifier
+) {
 
-    val tabTitles = listOf(test, "Suspects", "Weapons", "Rooms")
+    val tabTitles = listOf("Hide", "Suspects", "Weapons", "Rooms")
     val tabIconsSelected = listOf(
         painterResource(id = R.drawable.baseline_home_24),
         painterResource(id = R.drawable.baseline_person_search_24),
@@ -211,6 +221,12 @@ fun HideTab(modifier: Modifier = Modifier) {
 
 @Composable
 fun SuspectsTab(modifier: Modifier = Modifier) {
+    val viewModel = AppViewModel(TemplateRepository(TemplateRoomDatabase.getInstance(LocalContext.current).templateDao()))
+    Button(onClick = {
+        viewModel.addTemplate(Template(10, "t1", "asd", "asd", "asd"))
+    }) {
+        
+    }
     ListTab(
         modifier = modifier,
         items = listOf(

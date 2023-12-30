@@ -1,0 +1,58 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "60cca874dfa3ffbc9bf412c4abc365c0",
+    "entities": [
+      {
+        "tableName": "template",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `suspects` TEXT NOT NULL, `weapons` TEXT NOT NULL, `rooms` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "suspects",
+            "columnName": "suspects",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "weapons",
+            "columnName": "weapons",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rooms",
+            "columnName": "rooms",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '60cca874dfa3ffbc9bf412c4abc365c0')"
+    ]
+  }
+}
