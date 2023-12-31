@@ -8,6 +8,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -71,12 +72,15 @@ class MainActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
         setContent {
-            CluedroidTheme {
+            var darkMode by remember { mutableStateOf(false) }
+            CluedroidTheme(darkTheme = darkMode) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    CluedroidMain()
+                    CluedroidMain(func = {
+                        darkMode = darkMode != true
+                    })
                 }
             }
         }
@@ -86,7 +90,8 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CluedroidMain(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    func: () -> Unit
 ) {
     val templateViewModel = TemplateViewModel(
         TemplateRepository(
@@ -142,10 +147,10 @@ fun CluedroidMain(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color.Blue),
+            .background(color = MaterialTheme.colorScheme.onPrimary),
 
         ) {
-        TopBar()
+        TopBar(func = func)
 
         HorizontalPager(
             modifier = Modifier
@@ -193,7 +198,8 @@ fun CluedroidMain(
             },
             modifier = Modifier
                 .weight(0.09f)
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            containerColor = MaterialTheme.colorScheme.primaryContainer
         ) {
             repeat(tabTitles.size) {
                 Tab(text = { Text(tabTitles[it]) },
@@ -212,7 +218,7 @@ fun CluedroidMain(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(modifier: Modifier = Modifier) {
+fun TopBar(modifier: Modifier = Modifier, func: () -> Unit) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.LightGray
@@ -221,7 +227,9 @@ fun TopBar(modifier: Modifier = Modifier) {
             Text("")
         },
         navigationIcon = {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = {
+                func()
+            }) {
                 Icon(Icons.Rounded.Refresh, contentDescription = "New Game")
             }
         },
@@ -467,7 +475,7 @@ fun ListItem(
 @Composable
 fun CluedroidPreview() {
     CluedroidTheme {
-        CluedroidMain()
+        CluedroidMain(func = {})
     }
 }
 
