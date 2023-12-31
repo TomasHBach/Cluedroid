@@ -1,14 +1,17 @@
 package com.example.cluedroid
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -54,10 +57,13 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.cluedroid.DB.TemplateRoomDatabase
-import com.example.cluedroid.Repository.TemplateRepository
-import com.example.cluedroid.View.AppViewModel
+import com.example.cluedroid.db.TemplateRoomDatabase
+import com.example.cluedroid.repository.ActiveTemplateRepository
+import com.example.cluedroid.repository.TemplateRepository
+
 import com.example.cluedroid.ui.theme.CluedroidTheme
+import com.example.cluedroid.view.ActiveTemplateViewModel
+import com.example.cluedroid.view.TemplateViewModel
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -76,17 +82,45 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CluedroidMain(
     modifier: Modifier = Modifier
 ) {
-    val viewModel = AppViewModel(TemplateRepository(TemplateRoomDatabase.getInstance(LocalContext.current).templateDao()))
-    val template = viewModel.findTemplateById(0)
-    var suspects: List<String>? = null
-    if (template != null) {
-        suspects = template.suspects.trim().splitToSequence(';').filter { it.isNotEmpty() }.toList()
-    }
+    val templateViewModel = TemplateViewModel(
+        TemplateRepository(
+            TemplateRoomDatabase.getInstance(LocalContext.current).templateDao()
+        )
+    )
+    val activeTemplateViewModel = ActiveTemplateViewModel(
+        ActiveTemplateRepository(
+            TemplateRoomDatabase.getInstance(LocalContext.current).activeTemplateDao()
+        )
+    )
+    val template = templateViewModel.findTemplateById(
+        activeTemplateViewModel.getActiveTemplateData().activeTemplateIndex.toInt()
+    )
+    val activeTemplate = activeTemplateViewModel.getActiveTemplateData()
+    val suspects = template.suspects.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
+    val weapons = template.weapons.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
+    val rooms = template.rooms.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
+
+    val suspectsValues =
+        activeTemplate.suspectsBooleans.trim().splitToSequence(", ").filter { it.isNotEmpty() }
+            .toList().map { it.toBoolean() }
+    val weaponsValues =
+        activeTemplate.weaponsBooleans.trim().splitToSequence(", ").filter { it.isNotEmpty() }
+            .toList().map { it.toBoolean() }
+    val roomsValues =
+        activeTemplate.roomsBooleans.trim().splitToSequence(", ").filter { it.isNotEmpty() }
+            .toList().map { it.toBoolean() }
+    /*val suspects = null
+    val weapons = null
+    val rooms = null
+    val test = listOf(true,true,false).joinToString()
+    val str = test.trim().splitToSequence(", ").filter { it.isNotEmpty() }.toList()
+    */
 
     val tabTitles = listOf("Hide", "Suspects", "Weapons", "Rooms")
     val tabIconsSelected = listOf(
@@ -101,9 +135,8 @@ fun CluedroidMain(
         painterResource(id = R.drawable.outline_hardware_24),
         painterResource(id = R.drawable.outline_meeting_room_24)
     )
-    val tabs = listOf(HideTab(), SuspectsTab(), WeaponsTab(), RoomsTab())
 
-    val pagerState = rememberPagerState(pageCount = { tabs.size })
+    val pagerState = rememberPagerState(pageCount = { tabTitles.size })
     val coroutineScope = rememberCoroutineScope()
 
     Column(
@@ -119,7 +152,7 @@ fun CluedroidMain(
                 .weight(0.9f)
                 .fillMaxWidth(),
             state = pagerState,
-            beyondBoundsPageCount = 1
+            beyondBoundsPageCount = 4
         ) { page ->
             when (page) {
                 0 -> HideTab(
@@ -128,19 +161,24 @@ fun CluedroidMain(
                 )
 
                 1 -> SuspectsTab(
-                        Modifier
-                            .fillMaxSize(),
-                        suspectList = suspects
-                    )
+                    Modifier
+                        .fillMaxSize(),
+                    suspectList = suspects,
+                    suspectsValues = suspectsValues
+                )
 
                 2 -> WeaponsTab(
                     Modifier
-                        .fillMaxSize()
+                        .fillMaxSize(),
+                    weaponsList = weapons,
+                    weaponsValues = weaponsValues
                 )
 
                 3 -> RoomsTab(
                     Modifier
-                        .fillMaxSize()
+                        .fillMaxSize(),
+                    roomsList = rooms,
+                    roomsValues = roomsValues
                 )
             }
         }
@@ -206,7 +244,7 @@ fun HideTab(modifier: Modifier = Modifier) {
             Icons.Rounded.Search, contentDescription = null, modifier = Modifier.size(200.dp)
         )
         Text(
-            text = "Use this page to hide your notes from peaking eyes 👀",
+            text = "Use this page to hide your notes from peeking eyes 👀",
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp,
             textAlign = TextAlign.Center,
@@ -215,49 +253,101 @@ fun HideTab(modifier: Modifier = Modifier) {
     }
 }
 
+@SuppressLint("MutableCollectionMutableState")
 @Composable
-fun SuspectsTab(modifier: Modifier = Modifier, suspectList: List<String>? = listOf("Empty")) {
-    ListTab(
-        modifier = modifier,
-        items = suspectList ?: listOf("Empty")
-    )
-}
-
-@Composable
-fun WeaponsTab(modifier: Modifier = Modifier) {
-    ListTab(
-        modifier = modifier,
-        items = listOf(
-            "Candlestick",
-            "Dagger",
-            "Lead Pipe",
-            "Revolver",
-            "Rope",
-            "Wrench"
+fun SuspectsTab(
+    modifier: Modifier = Modifier,
+    suspectList: List<String>,
+    suspectsValues: List<Boolean>
+) {
+    val activeTemplateViewModel = ActiveTemplateViewModel(
+        ActiveTemplateRepository(
+            TemplateRoomDatabase.getInstance(LocalContext.current).activeTemplateDao()
         )
     )
-}
+    val tabValues: MutableList<Boolean> by remember {
+        mutableStateOf(suspectsValues.toMutableList())
+    }
 
-@Composable
-fun RoomsTab(modifier: Modifier = Modifier) {
     ListTab(
         modifier = modifier,
-        items = listOf(
-            "Ballroom",
-            "Billiard Room",
-            "Conservatory",
-            "Dining Room",
-            "Hall",
-            "Kitchen",
-            "Lounge",
-            "Library",
-            "Study"
+        title = "Suspects",
+        items = suspectList,
+        tabValues = tabValues,
+        dbUpdate = {
+            activeTemplateViewModel.updateSuspectsBooleans(tabValues.joinToString())
+        }
+    )
+}
+
+@SuppressLint("MutableCollectionMutableState")
+@Composable
+fun WeaponsTab(
+    modifier: Modifier = Modifier,
+    weaponsList: List<String>,
+    weaponsValues: List<Boolean>
+) {
+    val activeTemplateViewModel = ActiveTemplateViewModel(
+        ActiveTemplateRepository(
+            TemplateRoomDatabase.getInstance(LocalContext.current).activeTemplateDao()
         )
+    )
+    val tabValues: MutableList<Boolean> by remember {
+        mutableStateOf(weaponsValues.toMutableList())
+    }
+
+    ListTab(
+        modifier = modifier,
+        title = "Weapons",
+        items = weaponsList,
+        tabValues = tabValues,
+        dbUpdate = {
+            activeTemplateViewModel.updateWeaponsBooleans(tabValues.joinToString())
+        }
+    )
+}
+
+@SuppressLint("MutableCollectionMutableState")
+@Composable
+fun RoomsTab(
+    modifier: Modifier = Modifier,
+    roomsList: List<String>,
+    roomsValues: List<Boolean>
+) {
+    val activeTemplateViewModel = ActiveTemplateViewModel(
+        ActiveTemplateRepository(
+            TemplateRoomDatabase.getInstance(LocalContext.current).activeTemplateDao()
+        )
+    )
+    val tabValues: MutableList<Boolean> by remember {
+        mutableStateOf(roomsValues.toMutableList())
+    }
+
+    ListTab(
+        modifier = modifier,
+        title = "Rooms",
+        items = roomsList,
+        tabValues = tabValues,
+        dbUpdate = {
+            activeTemplateViewModel.updateRoomsBooleans(tabValues.joinToString())
+        }
     )
 }
 
 @Composable
-fun ListTab(modifier: Modifier = Modifier, items: List<String>) {
+fun ListTab(
+    modifier: Modifier = Modifier,
+    title: String,
+    items: List<String>,
+    tabValues: MutableList<Boolean>,
+    dbUpdate: () -> Unit
+) {
+    ActiveTemplateViewModel(
+        ActiveTemplateRepository(
+            TemplateRoomDatabase.getInstance(LocalContext.current).activeTemplateDao()
+        )
+    )
+
     Column(
         modifier = modifier
     ) {
@@ -275,7 +365,7 @@ fun ListTab(modifier: Modifier = Modifier, items: List<String>) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 15.dp, bottom = 20.dp),
-                text = "Suspects",
+                text = title,
                 textAlign = TextAlign.Center,
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold
@@ -291,7 +381,10 @@ fun ListTab(modifier: Modifier = Modifier, items: List<String>) {
                 horizontalAlignment = Alignment.Start,
             ) {
                 repeat(items.size) {
-                    ListItem(itemText = items[it])
+                    ListItem(itemText = items[it], initialValue = tabValues[it], itemValue = {
+                        tabValues[it] = tabValues[it] != true
+                        dbUpdate()
+                    })
                 }
             }
         }
@@ -299,35 +392,72 @@ fun ListTab(modifier: Modifier = Modifier, items: List<String>) {
 }
 
 @Composable
-fun ListItem(modifier: Modifier = Modifier, itemText: String) {
-    var textColor by remember { mutableStateOf(Color.Black) }
-    var textDecoration by remember { mutableStateOf(TextDecoration.None) }
+fun ListItem(
+    modifier: Modifier = Modifier,
+    itemText: String,
+    initialValue: Boolean,
+    itemValue: () -> Unit
+) {
+    var textColor by remember {
+        if (initialValue) {
+            mutableStateOf(Color.Black)
+        } else {
+            mutableStateOf(Color.LightGray)
+        }
+    }
+    var textDecoration by remember {
+        if (initialValue) {
+            mutableStateOf(TextDecoration.None)
+        } else {
+            mutableStateOf(TextDecoration.LineThrough)
+        }
+    }
+    var circleColor by remember {
+        if (initialValue) {
+            mutableStateOf(Color.Green)
+        } else {
+            mutableStateOf(Color.LightGray)
+        }
+    }
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(35.dp)
-            .padding(bottom = 5.dp, start = 5.dp, end = 5.dp)
+            .height(70.dp)
+            .padding(bottom = 5.dp, start = 10.dp, end = 10.dp)
+            .clip(RoundedCornerShape(20))
             .background(Color.Yellow)
             .clickable {
                 if (textColor == Color.Black) {
-                    textColor = Color.Yellow
+                    textColor = Color.LightGray
                     textDecoration = TextDecoration.LineThrough
+                    circleColor = Color.LightGray
+                    itemValue()
                 } else {
                     textColor = Color.Black
                     textDecoration = TextDecoration.None
+                    circleColor = Color.Green
+                    itemValue()
                 }
-            }
-            .clip(shape = RoundedCornerShape(10)),
-        verticalAlignment = Alignment.CenterVertically
+            },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
     ) {
-        Text(
+        Spacer(modifier = Modifier.padding(5.dp))
+        Canvas(
             modifier = Modifier
-                .fillMaxWidth(),
+                .size(35.dp)
+                .padding(vertical = 5.dp),
+            onDraw = {
+                drawCircle(color = circleColor)
+            }
+        )
+        Spacer(modifier = Modifier.padding(5.dp))
+        Text(
             text = itemText,
             color = textColor,
             textDecoration = textDecoration,
-            fontSize = 18.sp
+            fontSize = 20.sp
         )
     }
 

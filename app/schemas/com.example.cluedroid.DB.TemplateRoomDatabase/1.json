@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "60cca874dfa3ffbc9bf412c4abc365c0",
+    "identityHash": "6b0a229d7c02f581b50ed328f520601e",
     "entities": [
       {
         "tableName": "template",
@@ -47,12 +47,56 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "active_template",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `active_template_index` TEXT NOT NULL, `suspects_booleans` TEXT NOT NULL, `weapons_booleans` TEXT NOT NULL, `rooms_booleans` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "activeTemplateIndex",
+            "columnName": "active_template_index",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "suspectsBoolean",
+            "columnName": "suspects_booleans",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "weaponsBoolean",
+            "columnName": "weapons_booleans",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "roomsBoolean",
+            "columnName": "rooms_booleans",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '60cca874dfa3ffbc9bf412c4abc365c0')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6b0a229d7c02f581b50ed328f520601e')"
     ]
   }
 }
