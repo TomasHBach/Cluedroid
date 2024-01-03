@@ -8,7 +8,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,7 +39,9 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -364,7 +365,7 @@ fun ListTab(
                 .fillMaxSize()
                 .padding(10.dp)
                 .clip(RoundedCornerShape(corner = CornerSize(10)))
-                .background(Color.LightGray),
+                .background(MaterialTheme.colorScheme.primaryContainer),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start,
         ) {
@@ -406,6 +407,8 @@ fun ListItem(
     initialValue: Boolean,
     itemValue: () -> Unit
 ) {
+    var circleColorValue =  MaterialTheme.colorScheme.primary
+
     var textColor by remember {
         if (initialValue) {
             mutableStateOf(Color.Black)
@@ -422,7 +425,7 @@ fun ListItem(
     }
     var circleColor by remember {
         if (initialValue) {
-            mutableStateOf(Color.Green)
+            mutableStateOf(circleColorValue)
         } else {
             mutableStateOf(Color.LightGray)
         }
@@ -434,7 +437,7 @@ fun ListItem(
             .height(70.dp)
             .padding(bottom = 5.dp, start = 10.dp, end = 10.dp)
             .clip(RoundedCornerShape(20))
-            .background(Color.Yellow)
+            .background(MaterialTheme.colorScheme.onPrimaryContainer)
             .clickable {
                 if (textColor == Color.Black) {
                     textColor = Color.LightGray
@@ -444,7 +447,7 @@ fun ListItem(
                 } else {
                     textColor = Color.Black
                     textDecoration = TextDecoration.None
-                    circleColor = Color.Green
+                    circleColor = circleColorValue
                     itemValue()
                 }
             },
