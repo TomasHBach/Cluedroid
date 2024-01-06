@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -41,7 +42,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -73,14 +73,14 @@ class MainActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
         setContent {
-            var darkMode by remember { mutableStateOf(false) }
-            CluedroidTheme(darkTheme = darkMode) {
+            CluedroidTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
                     CluedroidMain(func = {
-                        darkMode = darkMode != true
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+
                     })
                 }
             }
@@ -230,6 +230,9 @@ fun TopBar(modifier: Modifier = Modifier, func: () -> Unit) {
         navigationIcon = {
             IconButton(onClick = {
                 func()
+                AppCompatDelegate.setDefaultNightMode(
+                    AppCompatDelegate.MODE_NIGHT_YES
+                )
             }) {
                 Icon(Icons.Rounded.Refresh, contentDescription = "New Game")
             }
@@ -407,28 +410,34 @@ fun ListItem(
     initialValue: Boolean,
     itemValue: () -> Unit
 ) {
-    var circleColorValue =  MaterialTheme.colorScheme.primary
+    val circleColorValue = MaterialTheme.colorScheme.primary
 
     var textColor by remember {
-        if (initialValue) {
-            mutableStateOf(Color.Black)
-        } else {
-            mutableStateOf(Color.LightGray)
-        }
+        mutableStateOf(
+            if (initialValue) {
+                Color.Black
+            } else {
+                Color.LightGray
+            }
+        )
     }
     var textDecoration by remember {
-        if (initialValue) {
-            mutableStateOf(TextDecoration.None)
-        } else {
-            mutableStateOf(TextDecoration.LineThrough)
-        }
+        mutableStateOf(
+            if (initialValue) {
+                TextDecoration.None
+            } else {
+                TextDecoration.LineThrough
+            }
+        )
     }
     var circleColor by remember {
-        if (initialValue) {
-            mutableStateOf(circleColorValue)
-        } else {
-            mutableStateOf(Color.LightGray)
-        }
+        mutableStateOf(
+            if (initialValue) {
+                circleColorValue
+            } else {
+                Color.LightGray
+            }
+        )
     }
 
     Row(
