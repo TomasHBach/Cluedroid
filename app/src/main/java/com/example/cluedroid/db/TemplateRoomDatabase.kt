@@ -9,7 +9,7 @@ import com.example.cluedroid.dao.TemplateDao
 import com.example.cluedroid.model.ActiveTemplate
 import com.example.cluedroid.model.Template
 
-@Database(entities = [(Template::class), (ActiveTemplate::class)], version = 1, exportSchema = true)
+@Database(entities = [(Template::class), (ActiveTemplate::class)], version = 1, exportSchema = false)
 abstract class TemplateRoomDatabase : RoomDatabase() {
     abstract fun templateDao(): TemplateDao
     abstract fun activeTemplateDao(): ActiveTemplateDao

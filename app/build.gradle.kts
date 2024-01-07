@@ -110,4 +110,10 @@ dependencies {
     //HiltViewModel
     implementation("androidx.hilt:hilt-navigation-fragment:1.1.0")
 
+    //Navigator
+    val nav_version = "2.7.6"
+
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+
+
 }
