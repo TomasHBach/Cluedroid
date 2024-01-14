@@ -1,26 +1,20 @@
 package com.example.cluedroid.ui
 
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -31,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,30 +33,40 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
+import androidx.core.app.ActivityCompat
+import com.example.cluedroid.db.TemplateRoomDatabase
+import com.example.cluedroid.repository.UserSettingsRepository
 import com.example.cluedroid.ui.theme.CluedroidTheme
+import com.example.cluedroid.ui.theme.isDarkMode
+import com.example.cluedroid.view.UserSettingsViewModel
+import com.example.cluedroid.model.Theme
 
 @Composable
-fun Settings() {
+fun Settings(function: () -> Unit) {
 // A surface container using the 'background' color from the theme
     Surface(
         modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
     ) {
-        SettingsMain()
+        var test by remember {
+            mutableStateOf(true)
+        }
+        SettingsMain({ test = !test }, function)
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsMain() {
-
+fun SettingsMain(func: () -> Unit, function: () -> Unit) {
+    val userSettingsViewModel = UserSettingsViewModel (
+        UserSettingsRepository(
+            TemplateRoomDatabase.getInstance(LocalContext.current).userSettingsDao()
+        )
+    )
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -89,10 +92,23 @@ fun SettingsMain() {
                         .clickable { }
                 )
             }
+            var test1 by remember {
+                mutableStateOf(false)
+            }
             Text(
-                text = "Settings",
+                text = "Settings $test1",
                 fontSize = 32.sp
             )
+            Button(onClick = { test1 = when (AppCompatDelegate.getDefaultNightMode()) {
+                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM -> false
+                AppCompatDelegate.MODE_NIGHT_NO -> false
+                AppCompatDelegate.MODE_NIGHT_YES -> true
+                else -> true
+            }
+                func()
+            }) {
+                
+            }
         }
         Spacer(modifier = Modifier.height(30.dp))
         Column(
@@ -110,7 +126,7 @@ fun SettingsMain() {
                     modifier = Modifier
                         .padding(start = 15.dp, top = 20.dp, bottom = 20.dp)
                 )
-                ThemeDropdownMenu()
+                ThemeDropdownMenu(func, function, userSettingsViewModel)
             }
 
         }
@@ -136,10 +152,19 @@ fun ListItem(text: String, func: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ThemeDropdownMenu() {
+fun ThemeDropdownMenu(func: () -> Unit, function: () -> Unit, viewModel: UserSettingsViewModel) {
     var expanded by remember { mutableStateOf(false) }
     val options = listOf("Auto", "Light", "Dark")
-    var selectedOptionText by remember { mutableStateOf(options[0]) }
+    var selectedOptionText by remember {
+        mutableStateOf(
+            when (AppCompatDelegate.getDefaultNightMode()) {
+                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM -> options[0]
+                AppCompatDelegate.MODE_NIGHT_NO -> options[1]
+                AppCompatDelegate.MODE_NIGHT_YES -> options[2]
+                else -> options[0]
+            }
+        )
+    }
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -170,6 +195,22 @@ fun ThemeDropdownMenu() {
                     text = { Text(selectionOption) },
                     onClick = {
                         selectedOptionText = selectionOption
+                        AppCompatDelegate.setDefaultNightMode(
+                            when (selectedOptionText) {
+                                options[0] -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                                options[1] -> AppCompatDelegate.MODE_NIGHT_NO
+                                options[2] -> AppCompatDelegate.MODE_NIGHT_YES
+                                else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                            }
+                        )
+                        when(selectedOptionText) {
+                            options[0] -> viewModel.updateTheme(Theme.AUTO.toString())
+                            options[1] -> viewModel.updateTheme(Theme.LIGHT.toString())
+                            options[2] -> viewModel.updateTheme(Theme.DARK.toString())
+                            else -> viewModel.updateTheme(Theme.AUTO.toString())
+                        }
+                        func()
+                        //function()
                         expanded = false
                     },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
@@ -178,12 +219,16 @@ fun ThemeDropdownMenu() {
             }
         }
     }
+    Button(onClick = {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES) }) {
+        func()
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun CluedroidPreview() {
     CluedroidTheme {
-        Settings()
+        FontVariation.Settings()
     }
 }

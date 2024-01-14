@@ -68,9 +68,12 @@ fun CluedroidGame() {
     Surface(
         modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
     ) {
-        CluedroidGameMain {
+        CluedroidGameMain({
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        }
+        })
+        /*{
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        }*/
     }
 }
 
@@ -213,9 +216,6 @@ fun TopBar(func: () -> Unit) {
         navigationIcon = {
             IconButton(onClick = {
                 func()
-                AppCompatDelegate.setDefaultNightMode(
-                    AppCompatDelegate.MODE_NIGHT_YES
-                )
             }) {
                 Icon(imageVector = Icons.Rounded.Refresh, contentDescription = "New Game")
             }

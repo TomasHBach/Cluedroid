@@ -8,7 +8,7 @@ import com.example.cluedroid.model.ActiveTemplate
 @Dao
 interface ActiveTemplateDao {
 
-    @Query("SELECT * FROM active_template WHERE active_template.id = 0")
+    @Query("SELECT * FROM active_template WHERE id = 0")
     fun getActiveTemplateData(): ActiveTemplate
 
     @Query("UPDATE active_template SET suspects_booleans = :data WHERE id = 0")
