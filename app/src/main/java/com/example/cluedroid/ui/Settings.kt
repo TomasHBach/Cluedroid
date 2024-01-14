@@ -13,8 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -25,6 +24,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,34 +36,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontVariation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.ActivityCompat
 import com.example.cluedroid.db.TemplateRoomDatabase
 import com.example.cluedroid.repository.UserSettingsRepository
-import com.example.cluedroid.ui.theme.CluedroidTheme
-import com.example.cluedroid.ui.theme.isDarkMode
 import com.example.cluedroid.view.UserSettingsViewModel
 import com.example.cluedroid.model.Theme
 
 @Composable
-fun Settings(function: () -> Unit) {
+fun Settings(
+    navigateBack: () -> Unit
+) {
 // A surface container using the 'background' color from the theme
     Surface(
         modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
     ) {
-        var test by remember {
-            mutableStateOf(true)
-        }
-        SettingsMain({ test = !test }, function)
+        SettingsMain(navigateBack)
     }
 }
 
 @Composable
-fun SettingsMain(func: () -> Unit, function: () -> Unit) {
-    val userSettingsViewModel = UserSettingsViewModel (
+private fun SettingsMain(navigateBack: () -> Unit) {
+    val userSettingsViewModel = UserSettingsViewModel(
         UserSettingsRepository(
             TemplateRoomDatabase.getInstance(LocalContext.current).userSettingsDao()
         )
@@ -70,46 +65,9 @@ fun SettingsMain(func: () -> Unit, function: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.onPrimary)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            IconButton(
-                onClick = { /*TODO*/ },
-                modifier = Modifier.background(Color.Transparent)
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.ArrowBack,
-                    contentDescription = "Go back",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clickable { }
-                )
-            }
-            var test1 by remember {
-                mutableStateOf(false)
-            }
-            Text(
-                text = "Settings $test1",
-                fontSize = 32.sp
-            )
-            Button(onClick = { test1 = when (AppCompatDelegate.getDefaultNightMode()) {
-                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM -> false
-                AppCompatDelegate.MODE_NIGHT_NO -> false
-                AppCompatDelegate.MODE_NIGHT_YES -> true
-                else -> true
-            }
-                func()
-            }) {
-                
-            }
-        }
+        TopBar(navigateBack)
         Spacer(modifier = Modifier.height(30.dp))
         Column(
             modifier = Modifier.fillMaxSize()
@@ -126,15 +84,33 @@ fun SettingsMain(func: () -> Unit, function: () -> Unit) {
                     modifier = Modifier
                         .padding(start = 15.dp, top = 20.dp, bottom = 20.dp)
                 )
-                ThemeDropdownMenu(func, function, userSettingsViewModel)
+                ThemeDropdownMenu(userSettingsViewModel)
             }
 
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListItem(text: String, func: () -> Unit) {
+private fun TopBar(navigateBack: () -> Unit) {
+    TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        ),
+        title = {
+            Text(text = "Settings")
+        },
+        navigationIcon = {
+            IconButton(onClick = navigateBack) {
+                Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "Go back")
+            }
+        }
+    )
+}
+
+@Composable
+private fun ListItem(text: String, func: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -152,7 +128,7 @@ fun ListItem(text: String, func: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ThemeDropdownMenu(func: () -> Unit, function: () -> Unit, viewModel: UserSettingsViewModel) {
+private fun ThemeDropdownMenu(viewModel: UserSettingsViewModel) {
     var expanded by remember { mutableStateOf(false) }
     val options = listOf("Auto", "Light", "Dark")
     var selectedOptionText by remember {
@@ -172,6 +148,7 @@ fun ThemeDropdownMenu(func: () -> Unit, function: () -> Unit, viewModel: UserSet
         modifier = Modifier
             .width(130.dp)
             .padding(end = 10.dp)
+            .background(MaterialTheme.colorScheme.onPrimary)
     ) {
         TextField(
             // The `menuAnchor` modifier must be passed to the text field for correctness.
@@ -184,6 +161,8 @@ fun ThemeDropdownMenu(func: () -> Unit, function: () -> Unit, viewModel: UserSet
             colors = ExposedDropdownMenuDefaults.textFieldColors(
                 unfocusedContainerColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
+                focusedContainerColor = MaterialTheme.colorScheme.onPrimary,
+                focusedIndicatorColor = Color.Transparent
             )
         )
         ExposedDropdownMenu(
@@ -195,6 +174,7 @@ fun ThemeDropdownMenu(func: () -> Unit, function: () -> Unit, viewModel: UserSet
                     text = { Text(selectionOption) },
                     onClick = {
                         selectedOptionText = selectionOption
+                        //Update text
                         AppCompatDelegate.setDefaultNightMode(
                             when (selectedOptionText) {
                                 options[0] -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
@@ -203,14 +183,13 @@ fun ThemeDropdownMenu(func: () -> Unit, function: () -> Unit, viewModel: UserSet
                                 else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
                             }
                         )
-                        when(selectedOptionText) {
+                        //Update settings database
+                        when (selectedOptionText) {
                             options[0] -> viewModel.updateTheme(Theme.AUTO.toString())
                             options[1] -> viewModel.updateTheme(Theme.LIGHT.toString())
                             options[2] -> viewModel.updateTheme(Theme.DARK.toString())
                             else -> viewModel.updateTheme(Theme.AUTO.toString())
                         }
-                        func()
-                        //function()
                         expanded = false
                     },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
@@ -218,17 +197,5 @@ fun ThemeDropdownMenu(func: () -> Unit, function: () -> Unit, viewModel: UserSet
                 )
             }
         }
-    }
-    Button(onClick = {
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES) }) {
-        func()
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CluedroidPreview() {
-    CluedroidTheme {
-        FontVariation.Settings()
     }
 }

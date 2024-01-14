@@ -4,11 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.cluedroid.db.TemplateRoomDatabase
 import com.example.cluedroid.model.Theme
 import com.example.cluedroid.repository.UserSettingsRepository
@@ -35,10 +34,32 @@ class MainActivity : ComponentActivity() {
                     else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
                 }
             )
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
+            val navController = rememberNavController()
+
             CluedroidTheme {
-                CluedroidGame()
+                NavHost(navController = navController, startDestination = Route.cluedroidGame) {
+                    composable(route = Route.cluedroidGame) {
+                        CluedroidGame (
+                            navigateToSettings = {
+                                navController.navigate(Route.settings)
+                            }
+                        )
+                    }
+                    composable(route = Route.settings) {
+                        Settings(
+                            navigateBack = {
+                                navController.popBackStack()
+                            }
+                        )
+                    }
+                }
             }
         }
+    }
+
+    object Route {
+        const val cluedroidGame = "CluedroidGame"
+        const val settings = "Settings"
     }
 }

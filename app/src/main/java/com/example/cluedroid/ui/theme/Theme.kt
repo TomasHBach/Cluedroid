@@ -75,7 +75,7 @@ fun CluedroidTheme(
 }
 
 @Composable
- fun isDarkMode() = when (AppCompatDelegate.getDefaultNightMode()) {
+private fun isDarkMode() = when (AppCompatDelegate.getDefaultNightMode()) {
     AppCompatDelegate.MODE_NIGHT_NO -> false
     AppCompatDelegate.MODE_NIGHT_YES -> true
     AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM -> isSystemInDarkTheme()

@@ -1,7 +1,6 @@
 package com.example.cluedroid.ui
 
 import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -26,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.sharp.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -63,23 +64,20 @@ import com.example.cluedroid.view.TemplateViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun CluedroidGame() {
+fun CluedroidGame(
+    navigateToSettings: () -> Unit
+) {
     // A surface container using the 'background' color from the theme
     Surface(
         modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
     ) {
-        CluedroidGameMain({
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        })
-        /*{
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        }*/
+        CluedroidGameMain(navigateToSettings)
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CluedroidGameMain(func: () -> Unit) {
+private fun CluedroidGameMain(navigateToSettings: () -> Unit) {
     val templateViewModel = TemplateViewModel(
         TemplateRepository(
             TemplateRoomDatabase.getInstance(LocalContext.current).templateDao()
@@ -107,14 +105,9 @@ fun CluedroidGameMain(func: () -> Unit) {
     val roomsValues =
         activeTemplate.roomsBooleans.trim().splitToSequence(", ").filter { it.isNotEmpty() }
             .toList().map { it.toBoolean() }
-    /*val suspects = null
-    val weapons = null
-    val rooms = null
-    val test = listOf(true,true,false).joinToString()
-    val str = test.trim().splitToSequence(", ").filter { it.isNotEmpty() }.toList()
-    */
 
     val tabTitles = listOf("Hide", "Suspects", "Weapons", "Rooms")
+
     val tabIconsSelected = listOf(
         painterResource(id = R.drawable.baseline_home_24),
         painterResource(id = R.drawable.baseline_person_search_24),
@@ -137,7 +130,7 @@ fun CluedroidGameMain(func: () -> Unit) {
             .background(color = MaterialTheme.colorScheme.onPrimary),
 
         ) {
-        TopBar(func = func)
+        TopBar(navigateToSettings)
 
         HorizontalPager(
             modifier = Modifier
@@ -205,23 +198,21 @@ fun CluedroidGameMain(func: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(func: () -> Unit) {
+private fun TopBar(navigateToSettings: () -> Unit) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.LightGray
+            containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
         title = {
             Text("")
         },
         navigationIcon = {
-            IconButton(onClick = {
-                func()
-            }) {
+            IconButton(onClick = {  }) {
                 Icon(imageVector = Icons.Rounded.Refresh, contentDescription = "New Game")
             }
         },
         actions = {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = navigateToSettings) {
                 Icon(imageVector = Icons.Rounded.Settings, contentDescription = "Settings")
             }
         }
@@ -229,17 +220,30 @@ fun TopBar(func: () -> Unit) {
 }
 
 @Composable
-fun HideTab(modifier: Modifier = Modifier) {
+private fun HideTab(modifier: Modifier = Modifier) {
+    val circleColor = MaterialTheme.colorScheme.primaryContainer
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
-            Icons.Rounded.Search, contentDescription = null, modifier = Modifier.size(200.dp)
+            Icons.Sharp.Search,
+            contentDescription = null,
+            modifier = Modifier
+                .size(250.dp)
+                .drawBehind {
+                    drawCircle(
+                        color = circleColor,
+                        radius = (this.size.width / 1.7).toFloat()
+                    )
+                }
         )
+        Spacer(modifier = Modifier.padding(30.dp))
         Text(
             text = "Use this page to hide your notes from peeking eyes 👀",
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp,
             textAlign = TextAlign.Center,
@@ -250,7 +254,7 @@ fun HideTab(modifier: Modifier = Modifier) {
 
 @SuppressLint("MutableCollectionMutableState")
 @Composable
-fun SuspectsTab(
+private fun SuspectsTab(
     modifier: Modifier = Modifier,
     suspectList: List<String>,
     suspectsValues: List<Boolean>
@@ -277,7 +281,7 @@ fun SuspectsTab(
 
 @SuppressLint("MutableCollectionMutableState")
 @Composable
-fun WeaponsTab(
+private fun WeaponsTab(
     modifier: Modifier = Modifier,
     weaponsList: List<String>,
     weaponsValues: List<Boolean>
@@ -304,7 +308,7 @@ fun WeaponsTab(
 
 @SuppressLint("MutableCollectionMutableState")
 @Composable
-fun RoomsTab(
+private fun RoomsTab(
     modifier: Modifier = Modifier,
     roomsList: List<String>,
     roomsValues: List<Boolean>
@@ -330,7 +334,7 @@ fun RoomsTab(
 }
 
 @Composable
-fun ListTab(
+private fun ListTab(
     modifier: Modifier = Modifier,
     title: String,
     items: List<String>,
@@ -387,20 +391,24 @@ fun ListTab(
 }
 
 @Composable
-fun ListItem(
+private fun ListItem(
     modifier: Modifier = Modifier,
     itemText: String,
     initialValue: Boolean,
     itemValue: () -> Unit
 ) {
-    val circleColorValue = MaterialTheme.colorScheme.primary
+    val circleColorValueUnmarked = MaterialTheme.colorScheme.onPrimary
+    val circleColorValueMarked = MaterialTheme.colorScheme.primary
+
+    val fontColorValueMarked = Color.LightGray
+    val fontColorValueUnmarked = MaterialTheme.colorScheme.surface
 
     var textColor by remember {
         mutableStateOf(
             if (initialValue) {
-                Color.Black
+                fontColorValueUnmarked
             } else {
-                Color.LightGray
+                fontColorValueMarked
             }
         )
     }
@@ -416,9 +424,9 @@ fun ListItem(
     var circleColor by remember {
         mutableStateOf(
             if (initialValue) {
-                circleColorValue
+                circleColorValueUnmarked
             } else {
-                Color.LightGray
+                circleColorValueMarked
             }
         )
     }
@@ -431,15 +439,15 @@ fun ListItem(
             .clip(RoundedCornerShape(20))
             .background(MaterialTheme.colorScheme.onPrimaryContainer)
             .clickable {
-                if (textColor == Color.Black) {
-                    textColor = Color.LightGray
+                if (textColor == fontColorValueUnmarked) {
+                    textColor = fontColorValueMarked
                     textDecoration = TextDecoration.LineThrough
-                    circleColor = Color.LightGray
+                    circleColor = circleColorValueMarked
                     itemValue()
                 } else {
-                    textColor = Color.Black
+                    textColor = fontColorValueUnmarked
                     textDecoration = TextDecoration.None
-                    circleColor = circleColorValue
+                    circleColor = circleColorValueUnmarked
                     itemValue()
                 }
             },
@@ -463,5 +471,4 @@ fun ListItem(
             fontSize = 20.sp
         )
     }
-
 }
