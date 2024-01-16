@@ -23,7 +23,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Refresh
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.sharp.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -50,6 +49,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -69,7 +69,7 @@ fun CluedroidGame(
 ) {
     // A surface container using the 'background' color from the theme
     Surface(
-        modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
+        modifier = Modifier.fillMaxSize(), color = backgroundColor()
     ) {
         CluedroidGameMain(navigateToSettings)
     }
@@ -78,6 +78,7 @@ fun CluedroidGame(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CluedroidGameMain(navigateToSettings: () -> Unit) {
+    //Get View Models
     val templateViewModel = TemplateViewModel(
         TemplateRepository(
             TemplateRoomDatabase.getInstance(LocalContext.current).templateDao()
@@ -88,14 +89,16 @@ private fun CluedroidGameMain(navigateToSettings: () -> Unit) {
             TemplateRoomDatabase.getInstance(LocalContext.current).activeTemplateDao()
         )
     )
+    //Get template and active template
     val template = templateViewModel.findTemplateById(
         activeTemplateViewModel.getActiveTemplateData().activeTemplateIndex.toInt()
     )
     val activeTemplate = activeTemplateViewModel.getActiveTemplateData()
+    //Get template data
     val suspects = template.suspects.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
     val weapons = template.weapons.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
     val rooms = template.rooms.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
-
+    //Get active template data (marked/unmarked)
     val suspectsValues =
         activeTemplate.suspectsBooleans.trim().splitToSequence(", ").filter { it.isNotEmpty() }
             .toList().map { it.toBoolean() }
@@ -106,7 +109,12 @@ private fun CluedroidGameMain(navigateToSettings: () -> Unit) {
         activeTemplate.roomsBooleans.trim().splitToSequence(", ").filter { it.isNotEmpty() }
             .toList().map { it.toBoolean() }
 
-    val tabTitles = listOf("Hide", "Suspects", "Weapons", "Rooms")
+    val tabTitles = listOf(
+        stringResource(R.string.hide_tab_title),
+        stringResource(R.string.suspects_tab_title),
+        stringResource(R.string.weapons_tab_title),
+        stringResource(R.string.rooms_tab_title)
+    )
 
     val tabIconsSelected = listOf(
         painterResource(id = R.drawable.baseline_home_24),
@@ -127,9 +135,8 @@ private fun CluedroidGameMain(navigateToSettings: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.onPrimary),
-
-        ) {
+            .background(color = backgroundColor()),
+    ) {
         TopBar(navigateToSettings)
 
         HorizontalPager(
@@ -179,13 +186,14 @@ private fun CluedroidGameMain(navigateToSettings: () -> Unit) {
             modifier = Modifier
                 .weight(0.09f)
                 .fillMaxWidth(),
-            containerColor = MaterialTheme.colorScheme.primaryContainer
+            containerColor = onPrimaryColor()
         ) {
             repeat(tabTitles.size) {
                 Tab(text = { Text(tabTitles[it]) },
                     icon = {
                         Icon(
-                            painter = (if (pagerState.currentPage == it) tabIconsSelected[it] else tabIconsNotSelected[it]),
+                            painter = (if (pagerState.currentPage == it) tabIconsSelected[it]
+                                else tabIconsNotSelected[it]),
                             contentDescription = null
                         )
                     },
@@ -201,19 +209,25 @@ private fun CluedroidGameMain(navigateToSettings: () -> Unit) {
 private fun TopBar(navigateToSettings: () -> Unit) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
+            containerColor = onPrimaryColor()
         ),
         title = {
             Text("")
         },
         navigationIcon = {
-            IconButton(onClick = {  }) {
-                Icon(imageVector = Icons.Rounded.Refresh, contentDescription = "New Game")
+            IconButton(onClick = { }) {
+                Icon(
+                    imageVector = Icons.Rounded.Refresh,
+                    contentDescription = stringResource(R.string.new_game_description)
+                )
             }
         },
         actions = {
             IconButton(onClick = navigateToSettings) {
-                Icon(imageVector = Icons.Rounded.Settings, contentDescription = "Settings")
+                Icon(
+                    imageVector = Icons.Rounded.Settings,
+                    contentDescription = stringResource(R.string.settings_description)
+                )
             }
         }
     )
@@ -221,7 +235,8 @@ private fun TopBar(navigateToSettings: () -> Unit) {
 
 @Composable
 private fun HideTab(modifier: Modifier = Modifier) {
-    val circleColor = MaterialTheme.colorScheme.primaryContainer
+    val circleColor = onPrimaryColor()
+    val iconColor = primaryColor()
 
     Column(
         modifier = modifier,
@@ -229,8 +244,9 @@ private fun HideTab(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
-            Icons.Sharp.Search,
+            imageVector = Icons.Sharp.Search,
             contentDescription = null,
+            tint = iconColor,
             modifier = Modifier
                 .size(250.dp)
                 .drawBehind {
@@ -242,10 +258,10 @@ private fun HideTab(modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.padding(30.dp))
         Text(
-            text = "Use this page to hide your notes from peeking eyes 👀",
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            text = stringResource(R.string.hide_tab_text),
+            color = onBackgroundColor(),
             fontWeight = FontWeight.Bold,
-            fontSize = 20.sp,
+            style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
             modifier = Modifier.width(350.dp)
         )
@@ -355,7 +371,7 @@ private fun ListTab(
                 .fillMaxSize()
                 .padding(10.dp)
                 .clip(RoundedCornerShape(corner = CornerSize(10)))
-                .background(MaterialTheme.colorScheme.primaryContainer),
+                .background(onPrimaryColor()),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start,
         ) {
@@ -364,6 +380,7 @@ private fun ListTab(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 15.dp, bottom = 20.dp),
+                color = onSurfaceColor(),
                 text = title,
                 textAlign = TextAlign.Center,
                 fontSize = 30.sp,
@@ -397,11 +414,11 @@ private fun ListItem(
     initialValue: Boolean,
     itemValue: () -> Unit
 ) {
-    val circleColorValueUnmarked = MaterialTheme.colorScheme.onPrimary
-    val circleColorValueMarked = MaterialTheme.colorScheme.primary
+    val circleColorValueUnmarked = onPrimaryColor()
+    val circleColorValueMarked = onPrimaryContainerColor()
 
-    val fontColorValueMarked = Color.LightGray
-    val fontColorValueUnmarked = MaterialTheme.colorScheme.surface
+    val fontColorValueMarked = surfaceVariantColor()
+    val fontColorValueUnmarked = backgroundColor()
 
     var textColor by remember {
         mutableStateOf(
@@ -437,7 +454,7 @@ private fun ListItem(
             .height(70.dp)
             .padding(bottom = 5.dp, start = 10.dp, end = 10.dp)
             .clip(RoundedCornerShape(20))
-            .background(MaterialTheme.colorScheme.onPrimaryContainer)
+            .background(primaryColor())
             .clickable {
                 if (textColor == fontColorValueUnmarked) {
                     textColor = fontColorValueMarked

@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Cluedroid</string>
+    <string name="hide_tab_title">Hide</string>
+    <string name="suspects_tab_title">Suspects</string>
+    <string name="weapons_tab_title">Weapons</string>
+    <string name="rooms_tab_title">Rooms</string>
+    <string name="new_game_description">New Game</string>
+    <string name="settings_description">Settings</string>
+    <string name="hide_tab_text">Use this page to hide your notes from peeking eyes 👀</string>
+    <string name="restart_app_toast_message">Restart the app for changes to take effect</string>
 </resources>

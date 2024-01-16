@@ -1,5 +1,7 @@
 package com.example.cluedroid.ui
 
+import android.content.Context
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,7 +22,6 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -38,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.cluedroid.R
 import com.example.cluedroid.db.TemplateRoomDatabase
 import com.example.cluedroid.repository.UserSettingsRepository
 import com.example.cluedroid.view.UserSettingsViewModel
@@ -49,7 +51,7 @@ fun Settings(
 ) {
 // A surface container using the 'background' color from the theme
     Surface(
-        modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
+        modifier = Modifier.fillMaxSize(), color = backgroundColor()
     ) {
         SettingsMain(navigateBack)
     }
@@ -65,7 +67,7 @@ private fun SettingsMain(navigateBack: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.onPrimary)
+            .background(backgroundColor())
     ) {
         TopBar(navigateBack)
         Spacer(modifier = Modifier.height(30.dp))
@@ -96,7 +98,7 @@ private fun SettingsMain(navigateBack: () -> Unit) {
 private fun TopBar(navigateBack: () -> Unit) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
+            containerColor = onPrimaryColor()
         ),
         title = {
             Text(text = "Settings")
@@ -129,6 +131,7 @@ private fun ListItem(text: String, func: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ThemeDropdownMenu(viewModel: UserSettingsViewModel) {
+    val currentContext = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
     val options = listOf("Auto", "Light", "Dark")
     var selectedOptionText by remember {
@@ -148,7 +151,7 @@ private fun ThemeDropdownMenu(viewModel: UserSettingsViewModel) {
         modifier = Modifier
             .width(130.dp)
             .padding(end = 10.dp)
-            .background(MaterialTheme.colorScheme.onPrimary)
+            .background(backgroundColor())
     ) {
         TextField(
             // The `menuAnchor` modifier must be passed to the text field for correctness.
@@ -161,7 +164,7 @@ private fun ThemeDropdownMenu(viewModel: UserSettingsViewModel) {
             colors = ExposedDropdownMenuDefaults.textFieldColors(
                 unfocusedContainerColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
-                focusedContainerColor = MaterialTheme.colorScheme.onPrimary,
+                focusedContainerColor = backgroundColor(),
                 focusedIndicatorColor = Color.Transparent
             )
         )
@@ -191,6 +194,7 @@ private fun ThemeDropdownMenu(viewModel: UserSettingsViewModel) {
                             else -> viewModel.updateTheme(Theme.AUTO.toString())
                         }
                         expanded = false
+                        restartAppToast(currentContext)
                     },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                     modifier = Modifier.background(Color.Transparent)
@@ -198,4 +202,12 @@ private fun ThemeDropdownMenu(viewModel: UserSettingsViewModel) {
             }
         }
     }
+}
+
+fun restartAppToast(context: Context) {
+    Toast.makeText(
+        context,
+        context.getString(R.string.restart_app_toast_message),
+        Toast.LENGTH_SHORT
+    ).show()
 }
