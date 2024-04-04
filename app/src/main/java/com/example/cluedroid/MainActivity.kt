@@ -10,11 +10,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.cluedroid.db.TemplateRoomDatabase
 import com.example.cluedroid.model.Theme
+import com.example.cluedroid.repository.ActiveTemplateRepository
 import com.example.cluedroid.repository.UserSettingsRepository
 import com.example.cluedroid.ui.windows.cluedroidGame.CluedroidGame
 import com.example.cluedroid.ui.windows.settings.Settings
 import com.example.cluedroid.ui.theme.CluedroidTheme
+import com.example.cluedroid.ui.windows.chooseTemplate.ChooseTemplate
 import com.example.cluedroid.ui.windows.startGame.StartGame
+import com.example.cluedroid.view.ActiveTemplateViewModel
 import com.example.cluedroid.view.UserSettingsViewModel
 
 class MainActivity : ComponentActivity() {
@@ -26,12 +29,17 @@ class MainActivity : ComponentActivity() {
                     TemplateRoomDatabase.getInstance(LocalContext.current).userSettingsDao()
                 )
             )
+            val activeTemplateViewModel = ActiveTemplateViewModel(
+                ActiveTemplateRepository(
+                    TemplateRoomDatabase.getInstance(LocalContext.current).activeTemplateDao()
+                )
+            )
 
             AppCompatDelegate.setDefaultNightMode(
-                when(userSettingsViewModel.getTheme()) {
+                when (userSettingsViewModel.getTheme()) {
                     Theme.LIGHT.toString() -> AppCompatDelegate.MODE_NIGHT_NO
                     Theme.DARK.toString() -> AppCompatDelegate.MODE_NIGHT_YES
-                    Theme.AUTO.toString() ->  AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                    Theme.AUTO.toString() -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
                     else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
                 }
             )
@@ -39,14 +47,25 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
 
             CluedroidTheme {
-                NavHost(navController = navController, startDestination = Route.cluedroidGame) {
+                NavHost(
+                    navController = navController,
+                    startDestination =
+                    if (activeTemplateViewModel.getActiveTemplateData().gameStarted.toBoolean())
+                        Route.cluedroidGame
+                    else
+                        Route.startGame
+                ) {
                     composable(route = Route.cluedroidGame) {
-                        CluedroidGame (
+                        CluedroidGame(
                             navigateToSettings = {
                                 navController.navigate(Route.settings)
                             },
                             navigateToStartGame = {
-                                navController.navigate(Route.startGame)
+                                navController.navigate(Route.startGame) {
+                                    popUpTo(Route.cluedroidGame) {
+                                        inclusive = true
+                                    }
+                                }
                             }
                         )
                     }
@@ -66,6 +85,19 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(Route.settings)
                             },
                             navigateToSelectTemplate = {
+                                navController.navigate(Route.chooseTemplate)
+                            }
+                        )
+                    }
+                    composable(route = Route.chooseTemplate) {
+                        ChooseTemplate(
+                            navigateToSettings = {
+                                navController.navigate(Route.settings)
+                            },
+                            navigateToStartGame = {
+                                navController.navigate(Route.startGame)
+                            },
+                            navigateToCreateTemplate = {
                                 //navController.navigate(Route.)
                             }
                         )
@@ -79,5 +111,6 @@ class MainActivity : ComponentActivity() {
         const val cluedroidGame = "CluedroidGame"
         const val settings = "Settings"
         const val startGame = "StartGame"
+        const val chooseTemplate = "ChooseTemplate"
     }
 }

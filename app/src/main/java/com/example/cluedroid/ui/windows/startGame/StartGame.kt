@@ -1,5 +1,6 @@
 package com.example.cluedroid.ui.windows.startGame
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,11 +29,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cluedroid.R
+import com.example.cluedroid.db.TemplateRoomDatabase
+import com.example.cluedroid.repository.ActiveTemplateRepository
+import com.example.cluedroid.repository.TemplateRepository
+import com.example.cluedroid.view.ActiveTemplateViewModel
+import com.example.cluedroid.view.TemplateViewModel
 
 @Composable
 fun StartGame(
@@ -57,9 +64,27 @@ private fun StartGameMain(
     navigateToSettings: () -> Unit = {},
     navigateToSelectTemplate: () -> Unit = {}
 ) {
+    //Get View Models
+    val templateViewModel = TemplateViewModel(
+        TemplateRepository(
+            TemplateRoomDatabase.getInstance(LocalContext.current).templateDao()
+        )
+    )
+    val activeTemplateViewModel = ActiveTemplateViewModel(
+        ActiveTemplateRepository(
+            TemplateRoomDatabase.getInstance(LocalContext.current).activeTemplateDao()
+        )
+    )
+    //Get template and active template
+    val templateName = templateViewModel.findTemplateById(
+        activeTemplateViewModel.getActiveTemplateData().activeTemplateIndex.toInt()
+    ).name
+
     val iconColor = MaterialTheme.colorScheme.onPrimaryContainer
     val circleColor = MaterialTheme.colorScheme.primaryContainer
     val templateColor = MaterialTheme.colorScheme.primaryContainer
+
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -87,7 +112,7 @@ private fun StartGameMain(
             modifier = Modifier
                 .height(100.dp)
                 .width(250.dp),
-            onClick = navigateToCluedroidGame,
+            onClick = { startGame(context, navigateToCluedroidGame) },
             shape = RoundedCornerShape(20.dp)
         ) {
             Text(
@@ -105,7 +130,7 @@ private fun StartGameMain(
             )
             Spacer(modifier = Modifier.width(5.dp))
             Text(
-                text = "Classic",
+                text = templateName,
                 fontSize = 20.sp,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier
@@ -162,8 +187,41 @@ private fun TopBar(navigateToSettings: () -> Unit) {
     )
 }
 
+private fun startGame(
+    context: Context,
+    navigateToCluedroidGame: () -> Unit = {}
+) {
+    //Get View Models
+    val templateViewModel = TemplateViewModel(
+        TemplateRepository(
+            TemplateRoomDatabase.getInstance(context).templateDao()
+        )
+    )
+    val activeTemplateViewModel = ActiveTemplateViewModel(
+        ActiveTemplateRepository(
+            TemplateRoomDatabase.getInstance(context).activeTemplateDao()
+        )
+    )
+    //Get active template
+    val template = templateViewModel.findTemplateById(
+        activeTemplateViewModel.getActiveTemplateData().activeTemplateIndex.toInt()
+    )
+    //Reset the active template table (put everything to true)
+    //Get data (to know the size)
+    val suspects = template.suspects.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
+    val weapons = template.weapons.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
+    val rooms = template.rooms.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
+    //Resetting active template table
+    activeTemplateViewModel.updateSuspectsBooleans(List(suspects.size) { true }.joinToString())
+    activeTemplateViewModel.updateWeaponsBooleans(List(weapons.size) { true }.joinToString())
+    activeTemplateViewModel.updateRoomsBooleans(List(rooms.size) { true }.joinToString())
+    //We set the game as started (true)
+    activeTemplateViewModel.updateGameStarted(true)
+
+    navigateToCluedroidGame()
+}
+
 @Preview
 @Composable
-fun Preview() {
-    StartGame()
+private fun Preview() {
 }

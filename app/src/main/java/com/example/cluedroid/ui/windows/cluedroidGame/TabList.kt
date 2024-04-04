@@ -25,8 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cluedroid.db.TemplateRoomDatabase
 import com.example.cluedroid.repository.ActiveTemplateRepository
-import com.example.cluedroid.ui.onPrimaryColor
-import com.example.cluedroid.ui.onSurfaceColor
 import com.example.cluedroid.view.ActiveTemplateViewModel
 
 @Composable

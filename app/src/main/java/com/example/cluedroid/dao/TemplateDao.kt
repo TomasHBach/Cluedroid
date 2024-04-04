@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.cluedroid.model.Template
+import com.example.cluedroid.model.TemplateIdName
 
 @Dao
 interface TemplateDao {
@@ -17,8 +18,8 @@ interface TemplateDao {
     @Query("SELECT * FROM template WHERE id = :templateId")
     fun findTemplateById(templateId: String): Template
 
-    @Query("SELECT * FROM template")
-    fun getAllTemplates(): List<Template>
+    @Query("SELECT id, name FROM template")
+    fun getAllTemplatesIdName(): List<TemplateIdName>
 
     @Update
     suspend fun updateTemplate(template: Template)

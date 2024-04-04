@@ -9,4 +9,6 @@
     <string name="hide_tab_text">Use this page to hide your notes from peeking eyes 👀</string>
     <string name="restart_app_toast_message">Restart the app for changes to take effect</string>
     <string name="another_version_text">"If you are playing another version of Cluedo or Clue, select or create a template: "</string>
+    <string name="choose_this_template_desciption">Choose this template</string>
+    <string name="go_back_to_template_list_description">Go back to template list</string>
 </resources>

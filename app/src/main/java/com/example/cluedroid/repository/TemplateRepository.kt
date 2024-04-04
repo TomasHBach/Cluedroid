@@ -14,6 +14,10 @@ class TemplateRepository(private val templateDao: TemplateDao) {
         return templateDao.findTemplateById(id.toString())
     }
 
+    fun getAllTemplatesIdName(): Map<Int, String> {
+        return templateDao.getAllTemplatesIdName().associateBy ({ it.id }, {it.name})
+    }
+
     fun addTemplate(newTemplate: Template) {
         coroutineScope.launch(Dispatchers.IO) {
             templateDao.addTemplate(newTemplate)

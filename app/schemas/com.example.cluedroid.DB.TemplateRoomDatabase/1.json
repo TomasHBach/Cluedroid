@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "6b0a229d7c02f581b50ed328f520601e",
+    "identityHash": "b29e2732047276aa6f89d2ed58fe26f3",
     "entities": [
       {
         "tableName": "template",
@@ -65,20 +65,46 @@
             "notNull": true
           },
           {
-            "fieldPath": "suspectsBoolean",
+            "fieldPath": "suspectsBooleans",
             "columnName": "suspects_booleans",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "weaponsBoolean",
+            "fieldPath": "weaponsBooleans",
             "columnName": "weapons_booleans",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "roomsBoolean",
+            "fieldPath": "roomsBooleans",
             "columnName": "rooms_booleans",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "user_settings",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `app_theme` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "appTheme",
+            "columnName": "app_theme",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -96,7 +122,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6b0a229d7c02f581b50ed328f520601e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b29e2732047276aa6f89d2ed58fe26f3')"
     ]
   }
 }

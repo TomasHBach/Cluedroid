@@ -14,6 +14,12 @@ class ActiveTemplateRepository(private val activeTemplateDao: ActiveTemplateDao)
         return activeTemplateDao.getActiveTemplateData()
     }
 
+    fun updateGameStarted(data: String) {
+        coroutineScope.launch(Dispatchers.IO) {
+            activeTemplateDao.updateGameStarted(data)
+        }
+    }
+
     fun updateSuspectsBooleans(data: String) {
         coroutineScope.launch(Dispatchers.IO) {
             activeTemplateDao.updateSuspectsBooleans(data)
@@ -29,6 +35,12 @@ class ActiveTemplateRepository(private val activeTemplateDao: ActiveTemplateDao)
     fun updateRoomsBooleans(data: String) {
         coroutineScope.launch(Dispatchers.IO) {
             activeTemplateDao.updateRoomsBooleans(data)
+        }
+    }
+
+    fun updateSelectedActiveTemplate(index: Int) {
+        coroutineScope.launch(Dispatchers.IO) {
+            activeTemplateDao.updateSelectedActiveTemplate(index.toString())
         }
     }
 

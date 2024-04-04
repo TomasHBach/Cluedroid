@@ -16,6 +16,10 @@ class ActiveTemplateViewModel @Inject constructor(private val activeTemplateRepo
         return activeTemplateRepository.getActiveTemplateData()
     }
 
+    fun updateGameStarted(data: Boolean) = viewModelScope.launch {
+        activeTemplateRepository.updateGameStarted(data.toString())
+    }
+
     fun updateSuspectsBooleans(data: String) = viewModelScope.launch {
         activeTemplateRepository.updateSuspectsBooleans(data)
     }
@@ -26,6 +30,10 @@ class ActiveTemplateViewModel @Inject constructor(private val activeTemplateRepo
 
     fun updateRoomsBooleans(data: String) = viewModelScope.launch {
         activeTemplateRepository.updateRoomsBooleans(data)
+    }
+
+    fun updateSelectedActiveTemplate(index: Int) = viewModelScope.launch {
+        activeTemplateRepository.updateSelectedActiveTemplate(index)
     }
 
     fun updateActiveTemplate(activeTemplate: ActiveTemplate) = viewModelScope.launch {

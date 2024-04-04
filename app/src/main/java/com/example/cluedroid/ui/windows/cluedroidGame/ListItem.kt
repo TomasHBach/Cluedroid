@@ -25,11 +25,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.cluedroid.ui.backgroundColor
-import com.example.cluedroid.ui.onPrimaryColor
-import com.example.cluedroid.ui.onPrimaryContainerColor
-import com.example.cluedroid.ui.primaryColor
-import com.example.cluedroid.ui.surfaceVariantColor
 
 @Composable
 internal fun ListItem(

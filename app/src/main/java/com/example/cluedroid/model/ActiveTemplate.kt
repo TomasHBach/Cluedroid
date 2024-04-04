@@ -14,6 +14,9 @@ data class ActiveTemplate (
     @ColumnInfo(name = "active_template_index")
     var activeTemplateIndex:String,
 
+    @ColumnInfo(name = "game_started")
+    var gameStarted:String,
+
     @ColumnInfo(name = "suspects_booleans")
     var suspectsBooleans:String,
 

@@ -15,8 +15,8 @@ class TemplateViewModel @Inject constructor(private val templateRepository: Temp
     fun findTemplateById(id: Int): Template {
         return templateRepository.findTemplateById(id)
     }
-    fun getAllTemplates() {
-        //TODO
+    fun getAllTemplatesIdName(): Map<Int, String> {
+        return templateRepository.getAllTemplatesIdName()
     }
     fun addTemplate(template: Template) = viewModelScope.launch {
         templateRepository.addTemplate(template)

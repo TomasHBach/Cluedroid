@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -142,6 +143,7 @@ private fun CluedroidGameMain(
                 onDismissRequest = { openResetDialog = false },
                 onConfirmation = {
                     openResetDialog = false
+                    activeTemplateViewModel.updateGameStarted(false)
                     navigateToStartGame()
                 }
             )
@@ -294,7 +296,7 @@ private fun SuspectsTab(
 
     TabList(
         modifier = modifier,
-        title = "Suspects",
+        title = stringResource(R.string.suspects_tab_title),
         items = suspectList,
         tabValues = tabValues,
         dbUpdate = {
@@ -321,7 +323,7 @@ private fun WeaponsTab(
 
     TabList(
         modifier = modifier,
-        title = "Weapons",
+        title = stringResource(R.string.weapons_tab_title),
         items = weaponsList,
         tabValues = tabValues,
         dbUpdate = {
@@ -348,7 +350,7 @@ private fun RoomsTab(
 
     TabList(
         modifier = modifier,
-        title = "Rooms",
+        title = stringResource(R.string.rooms_tab_title),
         items = roomsList,
         tabValues = tabValues,
         dbUpdate = {
