@@ -1,6 +1,8 @@
 package com.example.cluedroid.ui.windows.cluedroidGame
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -41,12 +43,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.cluedroid.R
 import com.example.cluedroid.db.TemplateRoomDatabase
 import com.example.cluedroid.repository.ActiveTemplateRepository
@@ -65,6 +67,10 @@ fun CluedroidGame(
         modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface
     ) {
         CluedroidGameMain(navigateToSettings, navigateToStartGame)
+        val activity = (LocalContext.current as? Activity)
+        BackHandler {
+            activity?.finish()
+        }
     }
 }
 
@@ -228,7 +234,8 @@ private fun TopBar(navigateToSettings: () -> Unit, openResetDialog: () -> Unit) 
             IconButton(onClick = openResetDialog) {
                 Icon(
                     imageVector = Icons.Rounded.Refresh,
-                    contentDescription = stringResource(R.string.new_game_description)
+                    contentDescription = stringResource(R.string.new_game_description),
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         },
@@ -236,7 +243,8 @@ private fun TopBar(navigateToSettings: () -> Unit, openResetDialog: () -> Unit) 
             IconButton(onClick = navigateToSettings) {
                 Icon(
                     imageVector = Icons.Rounded.Settings,
-                    contentDescription = stringResource(R.string.settings_description)
+                    contentDescription = stringResource(R.string.settings_description),
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -365,8 +373,11 @@ fun ResetDialog(
     onConfirmation: () -> Unit
 ) {
     AlertDialog(
-        text = {
-            Text(text = "Do you want to finish this game?")
+        title = {
+            Text(
+                text = "Do you want to finish this game?",
+                fontSize = 17.sp
+            )
         },
         onDismissRequest = {
             onDismissRequest()

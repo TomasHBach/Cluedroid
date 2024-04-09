@@ -1,7 +1,10 @@
 package com.example.cluedroid.ui.windows.startGame
 
+import android.app.Activity
 import android.content.Context
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -45,7 +48,7 @@ import com.example.cluedroid.view.TemplateViewModel
 fun StartGame(
     navigateToCluedroidGame: () -> Unit = {},
     navigateToSettings: () -> Unit = {},
-    navigateToSelectTemplate: () -> Unit = {}
+    navigateToChooseTemplate: () -> Unit = {}
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface
@@ -53,8 +56,12 @@ fun StartGame(
         StartGameMain(
             navigateToCluedroidGame,
             navigateToSettings,
-            navigateToSelectTemplate
+            navigateToChooseTemplate
         )
+        val activity = (LocalContext.current as? Activity)
+        BackHandler {
+            activity?.finish()
+        }
     }
 }
 
@@ -90,7 +97,8 @@ private fun StartGameMain(
         modifier = Modifier
             .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.surface),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
         TopBar(navigateToSettings)
         Spacer(modifier = Modifier.height(30.dp))
@@ -163,6 +171,7 @@ private fun StartGameMain(
                 fontSize = 25.sp
             )
         }
+        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 
@@ -180,7 +189,8 @@ private fun TopBar(navigateToSettings: () -> Unit) {
             IconButton(onClick = navigateToSettings) {
                 Icon(
                     imageVector = Icons.Rounded.Settings,
-                    contentDescription = stringResource(R.string.settings_description)
+                    contentDescription = stringResource(R.string.settings_description),
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         }

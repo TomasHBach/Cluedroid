@@ -1,10 +1,14 @@
 package com.example.cluedroid
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.integerResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -21,6 +25,7 @@ import com.example.cluedroid.view.ActiveTemplateViewModel
 import com.example.cluedroid.view.UserSettingsViewModel
 
 class MainActivity : ComponentActivity() {
+    @SuppressLint("RestrictedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -45,6 +50,8 @@ class MainActivity : ComponentActivity() {
             )
 
             val navController = rememberNavController()
+            val transitionDurationMillis =
+                integerResource(id = R.integer.transition_duration_millis)
 
             CluedroidTheme {
                 NavHost(
@@ -55,28 +62,83 @@ class MainActivity : ComponentActivity() {
                     else
                         Route.startGame
                 ) {
-                    composable(route = Route.cluedroidGame) {
+                    composable(
+                        route = Route.cluedroidGame,
+                        enterTransition = {
+                            return@composable slideIntoContainer(
+                                AnimatedContentTransitionScope.SlideDirection.Right,
+                                tween(transitionDurationMillis)
+                            )
+                        },
+                        exitTransition = {
+                            return@composable slideOutOfContainer(
+                                AnimatedContentTransitionScope.SlideDirection.Left,
+                                tween(transitionDurationMillis)
+                            )
+                        }
+                    ) {
                         CluedroidGame(
                             navigateToSettings = {
                                 navController.navigate(Route.settings)
                             },
                             navigateToStartGame = {
-                                navController.navigate(Route.startGame) {
-                                    popUpTo(Route.cluedroidGame) {
-                                        inclusive = true
-                                    }
-                                }
+                                navController.navigate(Route.startGame)
                             }
                         )
                     }
-                    composable(route = Route.settings) {
+                    composable(
+                        route = Route.settings,
+                        enterTransition = {
+                            return@composable slideIntoContainer(
+                                AnimatedContentTransitionScope.SlideDirection.Left,
+                                tween(transitionDurationMillis)
+                            )
+                        },
+                        exitTransition = {
+                            return@composable slideOutOfContainer(
+                                AnimatedContentTransitionScope.SlideDirection.Right,
+                                tween(transitionDurationMillis)
+                            )
+                        }
+                    ) {
                         Settings(
                             navigateBack = {
                                 navController.popBackStack()
                             }
                         )
                     }
-                    composable(route = Route.startGame) {
+                    composable(
+                        route = Route.startGame,
+                        enterTransition = {
+                            val currentRoute =
+                                navController.previousBackStackEntry?.destination?.route
+                            return@composable slideIntoContainer(
+                                when (currentRoute) {
+                                    Route.cluedroidGame -> AnimatedContentTransitionScope.SlideDirection.Right
+                                    Route.chooseTemplate -> AnimatedContentTransitionScope.SlideDirection.Left
+                                    else -> AnimatedContentTransitionScope.SlideDirection.Right
+                                },
+                                tween(transitionDurationMillis)
+                            )
+                        },
+                        exitTransition = {
+                            val currentRoute =
+                                navController.currentBackStackEntry?.destination?.route
+                            return@composable slideOutOfContainer(
+                                when (currentRoute) {
+                                    Route.settings, Route.cluedroidGame -> AnimatedContentTransitionScope.SlideDirection.Left
+                                    else -> AnimatedContentTransitionScope.SlideDirection.Right
+                                },
+                                tween(transitionDurationMillis)
+                            )
+                        },
+                        popEnterTransition = {
+                            return@composable slideIntoContainer(
+                                AnimatedContentTransitionScope.SlideDirection.Right,
+                                tween(transitionDurationMillis)
+                            )
+                        }
+                    ) {
                         StartGame(
                             navigateToCluedroidGame = {
                                 navController.navigate(Route.cluedroidGame)
@@ -84,18 +146,32 @@ class MainActivity : ComponentActivity() {
                             navigateToSettings = {
                                 navController.navigate(Route.settings)
                             },
-                            navigateToSelectTemplate = {
+                            navigateToChooseTemplate = {
                                 navController.navigate(Route.chooseTemplate)
                             }
                         )
                     }
-                    composable(route = Route.chooseTemplate) {
+                    composable(
+                        route = Route.chooseTemplate,
+                        enterTransition = {
+                            return@composable slideIntoContainer(
+                                AnimatedContentTransitionScope.SlideDirection.Right,
+                                tween(transitionDurationMillis)
+                            )
+                        },
+                        exitTransition = {
+                            return@composable slideOutOfContainer(
+                                AnimatedContentTransitionScope.SlideDirection.Left,
+                                tween(transitionDurationMillis)
+                            )
+                        }
+                    ) {
                         ChooseTemplate(
+                            navigateBack = {
+                                navController.navigate(Route.startGame)
+                            },
                             navigateToSettings = {
                                 navController.navigate(Route.settings)
-                            },
-                            navigateToStartGame = {
-                                navController.navigate(Route.startGame)
                             },
                             navigateToCreateTemplate = {
                                 //navController.navigate(Route.)

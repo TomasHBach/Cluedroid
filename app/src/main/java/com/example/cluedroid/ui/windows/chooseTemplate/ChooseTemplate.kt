@@ -37,16 +37,16 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ChooseTemplate(
+    navigateBack: () -> Unit,
     navigateToSettings: () -> Unit,
-    navigateToStartGame: () -> Unit,
     navigateToCreateTemplate: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface
     ) {
         ChooseTemplateMain(
+            navigateBack,
             navigateToSettings,
-            navigateToStartGame,
             navigateToCreateTemplate
         )
     }
@@ -55,8 +55,8 @@ fun ChooseTemplate(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ChooseTemplateMain(
+    navigateBack: () -> Unit,
     navigateToSettings: () -> Unit,
-    navigateToStartGame: () -> Unit,
     navigateToCreateTemplate: () -> Unit
 ) {
     //Get View Models
@@ -96,7 +96,7 @@ private fun ChooseTemplateMain(
             when (page) {
                 0 -> TemplateList(
                     templateList = templatesList,
-                    changeSelectedTemplate = {selectedTemplateId = it},
+                    changeSelectedTemplate = { selectedTemplateId = it },
                     viewTemplateInfoFunction = {
                         coroutineScope.launch { pagerState.animateScrollToPage(1) }
                     },
@@ -106,14 +106,19 @@ private fun ChooseTemplateMain(
                 1 -> TemplateInfo(
                     templateId = selectedTemplateId,
                     backFunction = { coroutineScope.launch { pagerState.animateScrollToPage(0) } },
-                    navigateToStartGame = navigateToStartGame
+                    navigateToStartGame = navigateBack
                 )
             }
             BackHandler(
-                enabled = page == 1
-            ) {
-                coroutineScope.launch { pagerState.animateScrollToPage(0) }
-            }
+                enabled = true,
+                onBack = {
+                    if (page == 0) {
+                        navigateBack()
+                    } else {
+                        coroutineScope.launch { pagerState.animateScrollToPage(0) }
+                    }
+                }
+            )
         }
     }
 }
@@ -132,7 +137,8 @@ private fun TopBar(navigateToSettings: () -> Unit) {
             IconButton(onClick = navigateToSettings) {
                 Icon(
                     imageVector = Icons.Rounded.Settings,
-                    contentDescription = stringResource(R.string.settings_description)
+                    contentDescription = stringResource(R.string.settings_description),
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         }

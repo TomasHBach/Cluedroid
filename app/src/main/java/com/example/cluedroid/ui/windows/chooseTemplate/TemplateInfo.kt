@@ -144,7 +144,7 @@ private fun SubListItem(
     itemText: String
 ) {
     val circleColor = MaterialTheme.colorScheme.primaryContainer
-    val textColor = MaterialTheme.colorScheme.onPrimaryContainer
+    val textColor = MaterialTheme.colorScheme.onSurface
 
     Row(
         modifier = modifier,

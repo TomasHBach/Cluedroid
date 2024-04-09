@@ -44,7 +44,6 @@ fun TemplateList(
         Column(
             modifier = Modifier
                 .weight(0.6f)
-                .verticalScroll(rememberScrollState())
         ) {
             Spacer(modifier = Modifier.height(20.dp))
             Row(
@@ -52,23 +51,26 @@ fun TemplateList(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    modifier = Modifier.padding(horizontal = 5.dp),
+                    modifier = Modifier.padding(start = 5.dp, end = 5.dp, bottom = 20.dp),
                     text = "Select a template",
                     fontSize = 21.sp
                 )
             }
-            Spacer(modifier = Modifier.height(20.dp))
-            templateList.forEach { entry ->
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState())
+            ) {
+                templateList.forEach { entry ->
+                    Divider(color = MaterialTheme.colorScheme.surfaceVariant)
+                    TemplateListItem(
+                        name = entry.value,
+                        function = {
+                            changeSelectedTemplate(entry.key)
+                            viewTemplateInfoFunction()
+                        }
+                    )
+                }
                 Divider(color = MaterialTheme.colorScheme.surfaceVariant)
-                TemplateListItem(
-                    name = entry.value,
-                    function = {
-                        changeSelectedTemplate(entry.key)
-                        viewTemplateInfoFunction()
-                    }
-                )
             }
-            Divider(color = MaterialTheme.colorScheme.surfaceVariant)
         }
         Button(
             modifier = Modifier
