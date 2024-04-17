@@ -21,6 +21,12 @@ interface TemplateDao {
     @Query("SELECT id, name FROM template")
     fun getAllTemplatesIdName(): List<TemplateIdName>
 
+    @Query("SELECT id FROM template ORDER BY id DESC LIMIT 1")
+    fun getLastIndex(): Int
+
+    @Query("SELECT id FROM template ORDER BY id ASC LIMIT 1")
+    fun getFirstIndex(): Int
+
     @Update
     suspend fun updateTemplate(template: Template)
 

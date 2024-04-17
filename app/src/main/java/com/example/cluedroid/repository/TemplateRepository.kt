@@ -18,6 +18,14 @@ class TemplateRepository(private val templateDao: TemplateDao) {
         return templateDao.getAllTemplatesIdName().associateBy ({ it.id }, {it.name})
     }
 
+    fun getLastIndex(): Int {
+        return templateDao.getLastIndex()
+    }
+
+    fun getFirstIndex(): Int {
+        return templateDao.getFirstIndex()
+    }
+
     fun addTemplate(newTemplate: Template) {
         coroutineScope.launch(Dispatchers.IO) {
             templateDao.addTemplate(newTemplate)
@@ -27,6 +35,12 @@ class TemplateRepository(private val templateDao: TemplateDao) {
     fun updateTemplate(template: Template) {
         coroutineScope.launch(Dispatchers.IO) {
             templateDao.updateTemplate(template)
+        }
+    }
+
+    fun deleteTemplate(template: Template) {
+        coroutineScope.launch {
+            templateDao.deleteTemplate(template)
         }
     }
 }

@@ -21,9 +21,17 @@ class TemplateViewModel @Inject constructor(private val templateRepository: Temp
     fun addTemplate(template: Template) = viewModelScope.launch {
         templateRepository.addTemplate(template)
     }
-
+    fun getLastIndex(): Int {
+        return templateRepository.getLastIndex()
+    }
+    fun getFirstIndex(): Int {
+        return templateRepository.getFirstIndex()
+    }
     fun updateTemplate(template: Template) = viewModelScope.launch {
         templateRepository.updateTemplate(template)
+    }
+    fun deleteTemplate(template: Template) = viewModelScope.launch {
+        templateRepository.deleteTemplate(template)
     }
 
 }

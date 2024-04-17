@@ -22,6 +22,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -41,11 +42,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cluedroid.R
 import com.example.cluedroid.db.TemplateRoomDatabase
+import com.example.cluedroid.model.Theme
 import com.example.cluedroid.repository.UserSettingsRepository
 import com.example.cluedroid.view.UserSettingsViewModel
-import com.example.cluedroid.model.Theme
-import com.example.cluedroid.ui.backgroundColor
-import com.example.cluedroid.ui.onPrimaryColor
 
 @Composable
 fun Settings(
@@ -53,7 +52,7 @@ fun Settings(
 ) {
 // A surface container using the 'background' color from the theme
     Surface(
-        modifier = Modifier.fillMaxSize(), color = backgroundColor()
+        modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface
     ) {
         SettingsMain(navigateBack)
     }
@@ -69,7 +68,7 @@ private fun SettingsMain(navigateBack: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundColor())
+            .background(MaterialTheme.colorScheme.surface)
     ) {
         TopBar(navigateBack)
         Spacer(modifier = Modifier.height(30.dp))
@@ -100,14 +99,17 @@ private fun SettingsMain(navigateBack: () -> Unit) {
 private fun TopBar(navigateBack: () -> Unit) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = onPrimaryColor()
+            containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
         title = {
-            Text(text = "Settings")
+            Text(text = "Settings", color = MaterialTheme.colorScheme.primary)
         },
         navigationIcon = {
             IconButton(onClick = navigateBack) {
-                Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "Go back")
+                Icon(
+                    imageVector = Icons.Rounded.ArrowBack, contentDescription = "Go back",
+                    tint = MaterialTheme.colorScheme.primary
+                )
             }
         }
     )
@@ -153,7 +155,7 @@ private fun ThemeDropdownMenu(viewModel: UserSettingsViewModel) {
         modifier = Modifier
             .width(130.dp)
             .padding(end = 10.dp)
-            .background(backgroundColor())
+            .background(MaterialTheme.colorScheme.surface)
     ) {
         TextField(
             // The `menuAnchor` modifier must be passed to the text field for correctness.
@@ -166,7 +168,7 @@ private fun ThemeDropdownMenu(viewModel: UserSettingsViewModel) {
             colors = ExposedDropdownMenuDefaults.textFieldColors(
                 unfocusedContainerColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
-                focusedContainerColor = backgroundColor(),
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
                 focusedIndicatorColor = Color.Transparent
             )
         )
@@ -206,7 +208,7 @@ private fun ThemeDropdownMenu(viewModel: UserSettingsViewModel) {
     }
 }
 
-fun restartAppToast(context: Context) {
+private fun restartAppToast(context: Context) {
     Toast.makeText(
         context,
         context.getString(R.string.restart_app_toast_message),

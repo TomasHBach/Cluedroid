@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.cluedroid.R
 import com.example.cluedroid.db.TemplateRoomDatabase
 import com.example.cluedroid.repository.TemplateRepository
@@ -39,7 +39,9 @@ import kotlinx.coroutines.launch
 fun ChooseTemplate(
     navigateBack: () -> Unit,
     navigateToSettings: () -> Unit,
-    navigateToCreateTemplate: () -> Unit
+    navigateToEditTemplate: () -> Unit,
+    navigateToCreateTemplate: () -> Unit,
+    updateEditSelectedTemplateId: (Int) -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface
@@ -47,7 +49,9 @@ fun ChooseTemplate(
         ChooseTemplateMain(
             navigateBack,
             navigateToSettings,
-            navigateToCreateTemplate
+            navigateToEditTemplate,
+            navigateToCreateTemplate,
+            updateEditSelectedTemplateId
         )
     }
 }
@@ -57,7 +61,9 @@ fun ChooseTemplate(
 private fun ChooseTemplateMain(
     navigateBack: () -> Unit,
     navigateToSettings: () -> Unit,
-    navigateToCreateTemplate: () -> Unit
+    navigateToEditTemplate: () -> Unit,
+    navigateToCreateTemplate: () -> Unit,
+    updateEditSelectedTemplateId: (Int) -> Unit
 ) {
     //Get View Models
     val templateViewModel = TemplateViewModel(
@@ -75,6 +81,7 @@ private fun ChooseTemplateMain(
     )
     val pagerState = rememberPagerState(pageCount = { tabTitles.size })
     val coroutineScope = rememberCoroutineScope()
+    val infoScrollPosition = rememberScrollState()
     var selectedTemplateId by remember {
         mutableIntStateOf(0)
     }
@@ -98,15 +105,22 @@ private fun ChooseTemplateMain(
                     templateList = templatesList,
                     changeSelectedTemplate = { selectedTemplateId = it },
                     viewTemplateInfoFunction = {
-                        coroutineScope.launch { pagerState.animateScrollToPage(1) }
+                        coroutineScope.launch {
+                            infoScrollPosition.scrollTo(0)
+                            pagerState.animateScrollToPage(1)
+                        }
                     },
                     navigateToCreateTemplate = navigateToCreateTemplate
                 )
 
                 1 -> TemplateInfo(
                     templateId = selectedTemplateId,
+                    infoScrollPosition = infoScrollPosition,
                     backFunction = { coroutineScope.launch { pagerState.animateScrollToPage(0) } },
-                    navigateToStartGame = navigateBack
+                    navigateToStartGame = navigateBack,
+                    navigateToEditTemplate = navigateToEditTemplate,
+                    updateEditSelectedTemplateId = updateEditSelectedTemplateId,
+                    deleteTemplate = navigateBack
                 )
             }
             BackHandler(
@@ -143,11 +157,4 @@ private fun TopBar(navigateToSettings: () -> Unit) {
             }
         }
     )
-}
-
-@Preview
-@Composable
-private fun Preview(
-
-) {
 }

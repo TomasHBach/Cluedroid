@@ -368,7 +368,7 @@ private fun RoomsTab(
 }
 
 @Composable
-fun ResetDialog(
+private fun ResetDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit
 ) {

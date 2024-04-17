@@ -84,11 +84,3 @@ internal fun TabList(
         }
     }
 }
-
-@Preview
-@Composable
-fun Preview() {
-    TabList(title = "Preview", items = listOf("item1", "item2"), tabValues = mutableListOf(true, false)) {
-        
-    }
-}

@@ -230,8 +230,3 @@ private fun startGame(
 
     navigateToCluedroidGame()
 }
-
-@Preview
-@Composable
-private fun Preview() {
-}
