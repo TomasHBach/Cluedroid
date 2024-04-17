@@ -20,8 +20,10 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.cluedroid.R
 import com.example.cluedroid.ui.windows.templateEditor.mainWindows.subWindows.TemplateNameWindow
 import com.example.cluedroid.ui.windows.templateEditor.mainWindows.subWindows.TextFieldWindow
 import kotlinx.coroutines.delay
@@ -44,6 +46,7 @@ fun TemplateEditorWindow(
     roomsMutableBooleanList: MutableList<MutableState<Boolean>>
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val dbDelimiter = stringResource(R.string.db_delimiter)
 
     Column(
         modifier = Modifier
@@ -66,7 +69,7 @@ fun TemplateEditorWindow(
 
                 1 -> TextFieldWindow(
                     scrollPosition = scrollPositionList[0],
-                    title = "Suspect",
+                    title = stringResource(R.string.suspect_tab_title),
                     mutableList = suspectsMutableList,
                     mutableBooleanList = suspectsMutableBooleanList,
                     backButtonFunc = {
@@ -78,7 +81,7 @@ fun TemplateEditorWindow(
 
                 2 -> TextFieldWindow(
                     scrollPosition = scrollPositionList[1],
-                    title = "Weapon",
+                    title = stringResource(R.string.weapon_tab_title),
                     mutableList = weaponsMutableList,
                     mutableBooleanList = weaponsMutableBooleanList,
                     backButtonFunc = {
@@ -91,7 +94,7 @@ fun TemplateEditorWindow(
 
                 3 -> TextFieldWindow(
                     scrollPosition = scrollPositionList[2],
-                    title = "Room",
+                    title = stringResource(R.string.room_tab_title),
                     mutableList = roomsMutableList,
                     mutableBooleanList = roomsMutableBooleanList,
                     backButtonFunc = {
@@ -141,9 +144,9 @@ fun TemplateEditorWindow(
             },
             enabled = when (subPagerState.currentPage) {
                 0 -> templateName.isNotEmpty()
-                1 -> isListValid(suspectsMutableList, suspectsMutableBooleanList)
-                2 -> isListValid(weaponsMutableList, weaponsMutableBooleanList)
-                3 -> isListValid(roomsMutableList, roomsMutableBooleanList)
+                1 -> isListValid(suspectsMutableList, suspectsMutableBooleanList, dbDelimiter)
+                2 -> isListValid(weaponsMutableList, weaponsMutableBooleanList, dbDelimiter)
+                3 -> isListValid(roomsMutableList, roomsMutableBooleanList, dbDelimiter)
                 else -> false
             },
             shape = RoundedCornerShape(20.dp),
@@ -153,7 +156,7 @@ fun TemplateEditorWindow(
             )
         ) {
             Text(
-                text = "Next",
+                text = stringResource(R.string.next_button),
                 fontSize = 35.sp
             )
         }
@@ -162,11 +165,12 @@ fun TemplateEditorWindow(
 
 private fun isListValid(
     mutableList: MutableList<String>,
-    mutableBooleanList: MutableList<MutableState<Boolean>>
+    mutableBooleanList: MutableList<MutableState<Boolean>>,
+    dbDelimiter: String
 ): Boolean {
     mutableList.forEachIndexed { index, item ->
         if (mutableBooleanList[index].value) {
-            if (item.isEmpty() || item.contains(";")) {
+            if (item.isEmpty() || item.contains(dbDelimiter)) {
                 return false
             }
         }

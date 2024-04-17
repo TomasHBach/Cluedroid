@@ -16,8 +16,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.cluedroid.R
 import com.example.cluedroid.ui.windows.templateEditor.mainWindows.subWindows.textFieldElements.TextFieldList
 
 @Composable
@@ -43,7 +45,7 @@ fun TextFieldWindow(
                         .padding(3.dp)
                         .fillMaxSize(),
                     imageVector = Icons.Rounded.ArrowBack,
-                    contentDescription = "Go back to previous step"
+                    contentDescription = stringResource(R.string.go_back_to_previous_step_description)
                 )
             }
         }
@@ -54,7 +56,7 @@ fun TextFieldWindow(
         ) {
             Text(
                 modifier = Modifier.padding(start = 5.dp, end = 5.dp, bottom = 20.dp, top = 5.dp),
-                text = "Type the ${title.lowercase()}s' names:",
+                text = stringResource(R.string.type_the_item_s_names, title.lowercase()),
                 fontSize = 21.sp
             )
         }

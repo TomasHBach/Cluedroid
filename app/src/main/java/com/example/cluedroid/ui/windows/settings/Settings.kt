@@ -37,6 +37,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -82,14 +85,14 @@ private fun SettingsMain(navigateBack: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Change theme",
+                    text = stringResource(R.string.change_theme),
                     fontSize = 22.sp,
                     modifier = Modifier
                         .padding(start = 15.dp, top = 20.dp, bottom = 20.dp)
                 )
                 ThemeDropdownMenu(userSettingsViewModel)
             }
-
+            CreditsItem()
         }
     }
 }
@@ -102,12 +105,16 @@ private fun TopBar(navigateBack: () -> Unit) {
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
         title = {
-            Text(text = "Settings", color = MaterialTheme.colorScheme.primary)
+            Text(
+                text = stringResource(R.string.settings_title),
+                color = MaterialTheme.colorScheme.primary
+            )
         },
         navigationIcon = {
             IconButton(onClick = navigateBack) {
                 Icon(
-                    imageVector = Icons.Rounded.ArrowBack, contentDescription = "Go back",
+                    imageVector = Icons.Rounded.ArrowBack,
+                    contentDescription = stringResource(R.string.go_back_button_description),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -115,7 +122,7 @@ private fun TopBar(navigateBack: () -> Unit) {
     )
 }
 
-@Composable
+/*@Composable
 private fun ListItem(text: String, func: () -> Unit) {
     Row(
         modifier = Modifier
@@ -130,14 +137,18 @@ private fun ListItem(text: String, func: () -> Unit) {
         )
         func()
     }
-}
+}*/
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ThemeDropdownMenu(viewModel: UserSettingsViewModel) {
     val currentContext = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
-    val options = listOf("Auto", "Light", "Dark")
+    val options = listOf(
+        stringResource(R.string.theme_value_auto),
+        stringResource(R.string.theme_value_light),
+        stringResource(R.string.theme_value_dark)
+    )
     var selectedOptionText by remember {
         mutableStateOf(
             when (AppCompatDelegate.getDefaultNightMode()) {
@@ -214,4 +225,48 @@ private fun restartAppToast(context: Context) {
         context.getString(R.string.restart_app_toast_message),
         Toast.LENGTH_SHORT
     ).show()
+}
+
+@Composable
+private fun CreditsItem(
+    modifier: Modifier = Modifier,
+) {
+    val uriHandler = LocalUriHandler.current
+    val cluedroidGithubUri = stringResource(R.string.cluedroid_github_uri)
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(20.dp, bottom = 20.dp),
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Column(
+            modifier = Modifier
+                .clickable {
+                    uriHandler.openUri(cluedroidGithubUri)
+                },
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(R.string.made_with_love_by),
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .padding(top = 20.dp, bottom = 10.dp)
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.github_icon),
+                contentDescription = stringResource(R.string.github_icon_description),
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.height(70.dp)
+            )
+            Text(
+                text = stringResource(R.string.dev_name),
+                fontSize = 16.sp,
+                modifier = Modifier
+                    .padding(top = 10.dp)
+            )
+        }
+    }
 }

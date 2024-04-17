@@ -23,8 +23,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.cluedroid.R
 
 @Composable
 fun TemplateNameWindow(
@@ -65,7 +67,7 @@ private fun TemplateNameWindowMain(
         ) {
             Text(
                 modifier = Modifier.padding(start = 5.dp, end = 5.dp, bottom = 20.dp),
-                text = "Type the template's name:",
+                text = stringResource(R.string.type_the_template_s_name),
                 fontSize = 21.sp
             )
         }
@@ -83,20 +85,21 @@ private fun TemplateNameWindowMain(
                 TextField(
                     value = templateName,
                     onValueChange = { updateTemplateName(it) },
-                    label = { Text("Template's name") },
+                    label = { Text(stringResource(R.string.template_s_name_description)) },
                     singleLine = true,
                     isError = (templateName.isEmpty() && isTyped),
                     supportingText = {
                         if (templateName.isEmpty() && isTyped) {
                             Text(
-                                text = "Suspect name cannot be empty",
+                                text = stringResource(R.string.template_s_name_cannot_be_empty),
                                 color = MaterialTheme.colorScheme.error
                             )
                         }
                     },
                     trailingIcon = {
                         if (templateName.isEmpty() && isTyped) {
-                            Icon(Icons.Filled.Info, "error", tint = MaterialTheme.colorScheme.error)
+                            Icon(Icons.Filled.Info,
+                                stringResource(R.string.error), tint = MaterialTheme.colorScheme.error)
                         }
                     },
                     modifier = Modifier

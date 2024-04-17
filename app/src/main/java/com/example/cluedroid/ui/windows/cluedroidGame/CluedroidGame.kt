@@ -100,9 +100,9 @@ private fun CluedroidGameMain(
     )
     val activeTemplate = activeTemplateViewModel.getActiveTemplateData()
     //Get template data
-    val suspects = template.suspects.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
-    val weapons = template.weapons.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
-    val rooms = template.rooms.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
+    val suspects = template.suspects.trim().splitToSequence(stringResource(R.string.db_delimiter)).filter { it.isNotEmpty() }.toList()
+    val weapons = template.weapons.trim().splitToSequence(stringResource(R.string.db_delimiter)).filter { it.isNotEmpty() }.toList()
+    val rooms = template.rooms.trim().splitToSequence(stringResource(R.string.db_delimiter)).filter { it.isNotEmpty() }.toList()
     //Get active template data (marked/unmarked)
     val suspectsValues =
         activeTemplate.suspectsBooleans.trim().splitToSequence(", ").filter { it.isNotEmpty() }
@@ -375,7 +375,7 @@ private fun ResetDialog(
     AlertDialog(
         title = {
             Text(
-                text = "Do you want to finish this game?",
+                text = stringResource(R.string.finish_this_game_question),
                 fontSize = 17.sp
             )
         },
@@ -388,7 +388,7 @@ private fun ResetDialog(
                     onConfirmation()
                 }
             ) {
-                Text("Yes")
+                Text(stringResource(R.string.yes))
             }
         },
         dismissButton = {
@@ -397,7 +397,7 @@ private fun ResetDialog(
                     onDismissRequest()
                 }
             ) {
-                Text("No")
+                Text(stringResource(R.string.no))
             }
         }
     )

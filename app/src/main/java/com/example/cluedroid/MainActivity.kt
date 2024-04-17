@@ -195,10 +195,10 @@ class MainActivity : ComponentActivity() {
                             navigateToCreateTemplate = {
                                 navController.navigate(Route.templateCreator)
                             },
-                            updateEditSelectedTemplateId = {
-                                editModeTemplateId = it
-                            }
-                        )
+                            selectedTemplateId = editModeTemplateId
+                        ) {
+                            editModeTemplateId = it
+                        }
                     }
                     composable(
                         route = Route.templateEditor,

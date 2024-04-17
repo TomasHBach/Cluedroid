@@ -9,6 +9,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.example.cluedroid.R
 import com.example.cluedroid.db.TemplateRoomDatabase
 import com.example.cluedroid.model.Template
 import com.example.cluedroid.repository.ActiveTemplateRepository
@@ -27,6 +29,7 @@ fun TemplateEditorEditMode(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    val dbDelimiter = stringResource(id = R.string.db_delimiter)
 
     //Get View Models
     val templateViewModel = TemplateViewModel(
@@ -41,10 +44,10 @@ fun TemplateEditorEditMode(
         mutableStateOf(template.name)
     }
     val suspectsList =
-        template.suspects.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
+        template.suspects.trim().splitToSequence(stringResource(R.string.db_delimiter)).filter { it.isNotEmpty() }.toList()
     val weaponsList =
-        template.weapons.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
-    val roomsList = template.rooms.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
+        template.weapons.trim().splitToSequence(stringResource(R.string.db_delimiter)).filter { it.isNotEmpty() }.toList()
+    val roomsList = template.rooms.trim().splitToSequence(stringResource(R.string.db_delimiter)).filter { it.isNotEmpty() }.toList()
     //Suspects lists
     val suspectsMutableList = remember {
         suspectsList.toMutableStateList()
@@ -70,6 +73,7 @@ fun TemplateEditorEditMode(
     //Building the editor
     TemplateEditor(
         navigateBack = navigateBack,
+        title = stringResource(R.string.edit_template_title),
         templateName = templateName,
         updateTemplateName = { templateName = it },
         suspectsMutableList = suspectsMutableList,
@@ -83,6 +87,7 @@ fun TemplateEditorEditMode(
             navigateToStartGame,
             context,
             coroutineScope,
+            dbDelimiter,
             editModeTemplateId,
             templateName,
             suspectsMutableList,
@@ -99,6 +104,7 @@ fun TemplateEditorCreateMode(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    val dbDelimiter = stringResource(id = R.string.db_delimiter)
 
     var templateName by remember {
         mutableStateOf("")
@@ -131,6 +137,7 @@ fun TemplateEditorCreateMode(
     //Building the editor
     TemplateEditor(
         navigateBack = navigateBack,
+        title = stringResource(R.string.new_template_title),
         templateName = templateName,
         updateTemplateName = { templateName = it },
         suspectsMutableList = suspectsMutableList,
@@ -144,6 +151,7 @@ fun TemplateEditorCreateMode(
             navigateToStartGame,
             context,
             coroutineScope,
+            dbDelimiter,
             templateName,
             suspectsMutableList,
             weaponsMutableList,
@@ -156,6 +164,7 @@ private fun createTemplate(
     navigateToStartGame: () -> Unit,
     context: Context,
     coroutineScope: CoroutineScope,
+    dbDelimiter: String,
     templateName: String,
     suspectsMutableList: MutableList<String>,
     weaponsMutableList: MutableList<String>,
@@ -172,9 +181,9 @@ private fun createTemplate(
         templateViewModel.addTemplate(
             Template(
                 name = templateName,
-                suspects = suspectsMutableList.joinToString(separator = ";"),
-                weapons = weaponsMutableList.joinToString(separator = ";"),
-                rooms = roomsMutableList.joinToString(separator = ";")
+                suspects = suspectsMutableList.joinToString(separator = dbDelimiter),
+                weapons = weaponsMutableList.joinToString(separator = dbDelimiter),
+                rooms = roomsMutableList.joinToString(separator = dbDelimiter)
             )
         )
         delay(200)
@@ -190,6 +199,7 @@ private fun updateTemplate(
     navigateToStartGame: () -> Unit,
     context: Context,
     coroutineScope: CoroutineScope,
+    dbDelimiter: String,
     templateId: Int,
     templateName: String,
     suspectsMutableList: MutableList<String>,
@@ -208,9 +218,9 @@ private fun updateTemplate(
             Template(
                 id = templateId,
                 name = templateName,
-                suspects = suspectsMutableList.joinToString(separator = ";"),
-                weapons = weaponsMutableList.joinToString(separator = ";"),
-                rooms = roomsMutableList.joinToString(separator = ";")
+                suspects = suspectsMutableList.joinToString(separator = dbDelimiter),
+                weapons = weaponsMutableList.joinToString(separator = dbDelimiter),
+                rooms = roomsMutableList.joinToString(separator = dbDelimiter)
             )
         )
         delay(200)

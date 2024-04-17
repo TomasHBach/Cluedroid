@@ -20,11 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +37,7 @@ fun ChooseTemplate(
     navigateToSettings: () -> Unit,
     navigateToEditTemplate: () -> Unit,
     navigateToCreateTemplate: () -> Unit,
+    selectedTemplateId: Int,
     updateEditSelectedTemplateId: (Int) -> Unit
 ) {
     Surface(
@@ -51,6 +48,7 @@ fun ChooseTemplate(
             navigateToSettings,
             navigateToEditTemplate,
             navigateToCreateTemplate,
+            selectedTemplateId,
             updateEditSelectedTemplateId
         )
     }
@@ -63,6 +61,7 @@ private fun ChooseTemplateMain(
     navigateToSettings: () -> Unit,
     navigateToEditTemplate: () -> Unit,
     navigateToCreateTemplate: () -> Unit,
+    selectedTemplateId: Int,
     updateEditSelectedTemplateId: (Int) -> Unit
 ) {
     //Get View Models
@@ -82,9 +81,6 @@ private fun ChooseTemplateMain(
     val pagerState = rememberPagerState(pageCount = { tabTitles.size })
     val coroutineScope = rememberCoroutineScope()
     val infoScrollPosition = rememberScrollState()
-    var selectedTemplateId by remember {
-        mutableIntStateOf(0)
-    }
 
     Column(
         modifier = Modifier
@@ -103,7 +99,9 @@ private fun ChooseTemplateMain(
             when (page) {
                 0 -> TemplateList(
                     templateList = templatesList,
-                    changeSelectedTemplate = { selectedTemplateId = it },
+                    changeSelectedTemplate = {
+                        updateEditSelectedTemplateId(it)
+                    },
                     viewTemplateInfoFunction = {
                         coroutineScope.launch {
                             infoScrollPosition.scrollTo(0)

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -21,14 +20,12 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cluedroid.R
@@ -69,7 +66,7 @@ fun ReviewWindow(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 20.dp),
-                text = "Check everything is correct:",
+                text = stringResource(R.string.check_everything_is_correct),
                 fontSize = 21.sp,
                 textAlign = TextAlign.Center
             )
@@ -77,7 +74,7 @@ fun ReviewWindow(
                 modifier = Modifier.verticalScroll(scrollPosition)
             ) {
                 SubList(
-                    title = "Template's Name",
+                    title = stringResource(R.string.template_s_name),
                     items = listOf(templateName)
                 )
                 SubList(
@@ -104,7 +101,7 @@ fun ReviewWindow(
             shape = RoundedCornerShape(20.dp)
         ) {
             Text(
-                text = "Finish",
+                text = stringResource(R.string.finish_button),
                 fontSize = 35.sp
             )
         }
@@ -166,21 +163,6 @@ private fun SubListItem(
             text = itemText,
             color = textColor,
             fontSize = 20.sp
-        )
-    }
-}
-
-@Composable
-@Preview
-private fun Preview() {
-    Surface {
-        ReviewWindow(scrollPosition = rememberScrollState(),
-            templateName = "Test Template",
-            suspectsList = listOf("Test1", "Test2", "Test3"),
-            weaponsList = listOf("Test1", "Test2", "Test3"),
-            roomsList = listOf("Test1", "Test2", "Test3"),
-            backFunction = {},
-            finishButtonFunc = {}
         )
     }
 }

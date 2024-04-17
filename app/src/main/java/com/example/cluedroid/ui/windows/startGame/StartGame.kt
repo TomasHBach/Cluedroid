@@ -34,7 +34,6 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cluedroid.R
@@ -86,6 +85,7 @@ private fun StartGameMain(
     val templateName = templateViewModel.findTemplateById(
         activeTemplateViewModel.getActiveTemplateData().activeTemplateIndex.toInt()
     ).name
+    val dbDelimiter = stringResource(R.string.db_delimiter)
 
     val iconColor = MaterialTheme.colorScheme.onPrimaryContainer
     val circleColor = MaterialTheme.colorScheme.primaryContainer
@@ -120,11 +120,11 @@ private fun StartGameMain(
             modifier = Modifier
                 .height(100.dp)
                 .width(250.dp),
-            onClick = { startGame(context, navigateToCluedroidGame) },
+            onClick = { startGame(context, dbDelimiter, navigateToCluedroidGame) },
             shape = RoundedCornerShape(20.dp)
         ) {
             Text(
-                text = "Start Game",
+                text = stringResource(R.string.start_game_button),
                 fontSize = 35.sp
             )
         }
@@ -133,7 +133,7 @@ private fun StartGameMain(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Template: ",
+                text = stringResource(R.string.selected_template_text),
                 fontSize = 20.sp
             )
             Spacer(modifier = Modifier.width(5.dp))
@@ -167,7 +167,7 @@ private fun StartGameMain(
             shape = RoundedCornerShape(20.dp)
         ) {
             Text(
-                text = "Select Template",
+                text = stringResource(R.string.select_template_button),
                 fontSize = 25.sp
             )
         }
@@ -199,6 +199,7 @@ private fun TopBar(navigateToSettings: () -> Unit) {
 
 private fun startGame(
     context: Context,
+    dbDelimiter: String,
     navigateToCluedroidGame: () -> Unit = {}
 ) {
     //Get View Models
@@ -218,9 +219,9 @@ private fun startGame(
     )
     //Reset the active template table (put everything to true)
     //Get data (to know the size)
-    val suspects = template.suspects.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
-    val weapons = template.weapons.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
-    val rooms = template.rooms.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
+    val suspects = template.suspects.trim().splitToSequence(dbDelimiter).filter { it.isNotEmpty() }.toList()
+    val weapons = template.weapons.trim().splitToSequence(dbDelimiter).filter { it.isNotEmpty() }.toList()
+    val rooms = template.rooms.trim().splitToSequence(dbDelimiter).filter { it.isNotEmpty() }.toList()
     //Resetting active template table
     activeTemplateViewModel.updateSuspectsBooleans(List(suspects.size) { true }.joinToString())
     activeTemplateViewModel.updateWeaponsBooleans(List(weapons.size) { true }.joinToString())

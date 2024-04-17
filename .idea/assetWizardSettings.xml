@@ -33,8 +33,9 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="baseline_hardware_24" />
-                            <entry key="sourceFile" value="C:\Users\totit\AndroidStudioProjects\Cluedroid" />
+                            <entry key="assetSourceType" value="FILE" />
+                            <entry key="outputName" value="github_icon_light" />
+                            <entry key="sourceFile" value="C:\Users\totit\Downloads\github-mark\github-mark-white.svg" />
                           </map>
                         </option>
                       </PersistentState>

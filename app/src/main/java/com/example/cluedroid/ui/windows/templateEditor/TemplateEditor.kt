@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,7 +20,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -30,8 +30,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import com.example.cluedroid.R
 import com.example.cluedroid.ui.windows.templateEditor.mainWindows.ReviewWindow
 import com.example.cluedroid.ui.windows.templateEditor.mainWindows.TemplateEditorWindow
 import kotlinx.coroutines.launch
@@ -39,6 +41,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun TemplateEditor(
     navigateBack: () -> Unit,
+    title: String,
     templateName: String,
     updateTemplateName: (String) -> Unit,
     suspectsMutableList: MutableList<String>,
@@ -54,6 +57,7 @@ fun TemplateEditor(
     ) {
         TemplateEditorMain(
             navigateBack,
+            title,
             templateName,
             updateTemplateName,
             suspectsMutableList,
@@ -71,6 +75,7 @@ fun TemplateEditor(
 @Composable
 private fun TemplateEditorMain(
     navigateBack: () -> Unit,
+    title: String,
     templateName: String,
     updateTemplateName: (String) -> Unit,
     suspectsMutableList: MutableList<String>,
@@ -100,7 +105,7 @@ private fun TemplateEditorMain(
             .background(color = MaterialTheme.colorScheme.surface),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        TopBar { openLeaveDialog = openLeaveDialog == false }
+        TopBar(title) { openLeaveDialog = openLeaveDialog == false }
 
         if (openLeaveDialog) {
             LeaveDialog(
@@ -154,11 +159,15 @@ private fun TemplateEditorMain(
                 enabled = true,
                 onBack = {
                     if (page == 0) {
-                        when(subPagerState.currentPage) {
-                            0 -> {openLeaveDialog = true}
+                        when (subPagerState.currentPage) {
+                            0 -> {
+                                openLeaveDialog = true
+                            }
+
                             1 -> coroutineScope.launch {
                                 subPagerState.animateScrollToPage(0)
                             }
+
                             else -> coroutineScope.launch {
                                 scrollPositionList[subPagerState.currentPage - 2].scrollTo(0)
                                 subPagerState.animateScrollToPage(subPagerState.currentPage - 1)
@@ -178,19 +187,26 @@ private fun TemplateEditorMain(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(cancelAndLeave: () -> Unit) {
-    TopAppBar(
+private fun TopBar(
+    title: String,
+    cancelAndLeave: () -> Unit
+) {
+    CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
         title = {
-            Text(text = "Edit Template", textAlign = TextAlign.Center)
+            Text(
+                text = title,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.primary,
+            )
         },
         navigationIcon = {
             IconButton(onClick = cancelAndLeave) {
                 Icon(
                     imageVector = Icons.Rounded.Close,
-                    contentDescription = "Leave edit mode",
+                    contentDescription = stringResource(R.string.leave_edit_mode_icon_description),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -206,7 +222,7 @@ private fun LeaveDialog(
     AlertDialog(
         title = {
             Text(
-                text = "Cancel and discard changes?",
+                text = stringResource(R.string.cancel_and_discard_changes_question),
                 fontSize = 17.sp
             )
         },
@@ -219,7 +235,7 @@ private fun LeaveDialog(
                     onConfirmation()
                 }
             ) {
-                Text("Yes")
+                Text(stringResource(R.string.yes))
             }
         },
         dismissButton = {
@@ -228,7 +244,7 @@ private fun LeaveDialog(
                     onDismissRequest()
                 }
             ) {
-                Text("No")
+                Text(stringResource(R.string.no))
             }
         }
     )

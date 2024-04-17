@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.rounded.Delete
@@ -23,11 +25,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.example.cluedroid.R
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun TextFieldItem(
     modifier: Modifier = Modifier,
@@ -47,6 +55,7 @@ internal fun TextFieldItem(
         mutableStateOf(false)
     }
     val coroutineScope = rememberCoroutineScope()
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     AnimatedVisibility(
         visible = visible,
@@ -65,28 +74,35 @@ internal fun TextFieldItem(
                     text = it
                     updateText(text)
                 },
-                label = { Text("$title's name") },
+                label = { Text(stringResource(R.string.item_s_name, title)) },
                 singleLine = true,
-                isError = ((text.isEmpty() || text.contains(";")) && isTyped),
+                isError = ((text.isEmpty() || text.contains(stringResource(R.string.db_delimiter))) && isTyped),
                 supportingText = {
                     if (text.isEmpty() && isTyped) {
                         Text(
-                            text = "$title's name cannot be empty",
+                            text = stringResource(R.string.item_s_name_cannot_be_empty, title),
                             color = MaterialTheme.colorScheme.error
                         )
                     }
-                    if (text.contains(";") && isTyped) {
+                    if (text.contains(stringResource(R.string.db_delimiter)) && isTyped) {
                         Text(
-                            text = "$title's name cannot contain ;",
+                            text = stringResource(
+                                R.string.item_s_name_cannot_contain_delimiter,
+                                title
+                            ),
                             color = MaterialTheme.colorScheme.error
                         )
                     }
                 },
                 trailingIcon = {
-                    if ((text.isEmpty() || text.contains(";")) && isTyped) {
-                        Icon(Icons.Filled.Info, "error", tint = MaterialTheme.colorScheme.error)
+                    if ((text.isEmpty() || text.contains(stringResource(R.string.db_delimiter))) && isTyped) {
+                        Icon(Icons.Filled.Info, stringResource(R.string.error), tint = MaterialTheme.colorScheme.error)
                     }
                 },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(
+                    onDone = { keyboardController?.hide() }
+                ),
                 modifier = Modifier
                     .weight(0.8f)
                     .onFocusChanged {
@@ -109,7 +125,7 @@ internal fun TextFieldItem(
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Delete,
-                    contentDescription = "Delete this $title"
+                    contentDescription = stringResource(R.string.delete_this_item, title)
                 )
             }
         }

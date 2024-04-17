@@ -51,7 +51,7 @@ fun TemplateList(
             ) {
                 Text(
                     modifier = Modifier.padding(start = 5.dp, end = 5.dp, bottom = 20.dp),
-                    text = "Select a template",
+                    text = stringResource(R.string.select_a_template),
                     fontSize = 21.sp
                 )
             }
@@ -81,7 +81,7 @@ fun TemplateList(
             shape = RoundedCornerShape(20.dp)
         ) {
             Text(
-                text = "New Template",
+                text = stringResource(R.string.new_template_button_text),
                 fontSize = 35.sp
             )
         }

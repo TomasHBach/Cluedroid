@@ -4,21 +4,21 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.cluedroid.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -61,11 +61,11 @@ fun TextFieldList(
             Icon(
                 modifier = Modifier.fillMaxSize(),
                 imageVector = Icons.Rounded.Add,
-                contentDescription = "Add a $title"
+                contentDescription = stringResource(R.string.add_a_item, title)
             )
         }
-        for (i in 0 until mutableList.size) {
+        /*for (i in 0 until mutableList.size) {
             Text(text = mutableList[i] + " : " + mutableBooleanList[i].value)
-        }
+        }*/
     }
 }

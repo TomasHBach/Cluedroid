@@ -66,6 +66,7 @@ fun TemplateInfo(
             TemplateRoomDatabase.getInstance(LocalContext.current).templateDao()
         )
     )
+    val dbDelimiter = stringResource(R.string.db_delimiter)
 
     var openEditDialog by remember {
         mutableStateOf(false)
@@ -121,7 +122,7 @@ fun TemplateInfo(
                                 .padding(5.dp)
                                 .fillMaxSize(),
                             imageVector = Icons.Rounded.Edit,
-                            contentDescription = "Edit this template"
+                            contentDescription = stringResource(R.string.edit_this_template)
                         )
                     }
                     IconButton(
@@ -132,7 +133,7 @@ fun TemplateInfo(
                                 .padding(5.dp)
                                 .fillMaxSize(),
                             imageVector = Icons.Rounded.Delete,
-                            contentDescription = "Delete this template"
+                            contentDescription = stringResource(R.string.delete_this_template)
                         )
                     }
                 }
@@ -142,7 +143,7 @@ fun TemplateInfo(
             ) {
                 if (openEditDialog) {
                     MessageDialog(
-                        message = "Edit this template?",
+                        message = stringResource(R.string.edit_this_template_question),
                         onConfirmation = {
                             openEditDialog = false
                             updateEditSelectedTemplateId(templateId)
@@ -152,14 +153,14 @@ fun TemplateInfo(
                 }
                 if (openDeleteDialog) {
                     MessageDialog(
-                        message = "Delete this template?",
+                        message = stringResource(R.string.delete_this_template_question),
                         onConfirmation = {
                             openDeleteDialog = false
                             coroutineScope.launch {
                                 deleteTemplate()
-                                delay(200)
+                                delay(50)
                                 isDeleting = true
-                                deleteSelectedTemplate(templateId, context)
+                                deleteSelectedTemplate(templateId, dbDelimiter, context)
                             }
                         },
                         onDismissRequest = { openDeleteDialog = false })
@@ -191,7 +192,7 @@ fun TemplateInfo(
             shape = RoundedCornerShape(20.dp)
         ) {
             Text(
-                text = "Choose",
+                text = stringResource(R.string.choose_button_text),
                 fontSize = 35.sp
             )
         }
@@ -248,7 +249,7 @@ private fun MessageDialog(
                     onConfirmation()
                 }
             ) {
-                Text("Yes")
+                Text(stringResource(R.string.yes))
             }
         },
         dismissButton = {
@@ -257,7 +258,7 @@ private fun MessageDialog(
                     onDismissRequest()
                 }
             ) {
-                Text("No")
+                Text(stringResource(R.string.no))
             }
         }
     )
@@ -328,6 +329,7 @@ private fun goToStartGame(
 
 private fun deleteSelectedTemplate(
     selectedTemplateId: Int,
+    dbDelimiter: String,
     context: Context
 ) {
     //Get View Models
@@ -348,9 +350,9 @@ private fun deleteSelectedTemplate(
     activeTemplateViewModel.updateSelectedActiveTemplate(template.id)
     //Reset the active template table (put everything to true)
     //Get data (to know the size)
-    val suspects = template.suspects.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
-    val weapons = template.weapons.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
-    val rooms = template.rooms.trim().splitToSequence(";").filter { it.isNotEmpty() }.toList()
+    val suspects = template.suspects.trim().splitToSequence(dbDelimiter).filter { it.isNotEmpty() }.toList()
+    val weapons = template.weapons.trim().splitToSequence(dbDelimiter).filter { it.isNotEmpty() }.toList()
+    val rooms = template.rooms.trim().splitToSequence(dbDelimiter).filter { it.isNotEmpty() }.toList()
     //Resetting active template table
     activeTemplateViewModel.updateSuspectsBooleans(List(suspects.size) { true }.joinToString())
     activeTemplateViewModel.updateWeaponsBooleans(List(weapons.size) { true }.joinToString())
