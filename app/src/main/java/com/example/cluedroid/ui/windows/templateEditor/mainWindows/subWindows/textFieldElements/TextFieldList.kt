@@ -3,6 +3,7 @@ package com.example.cluedroid.ui.windows.templateEditor.mainWindows.subWindows.t
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -32,7 +33,9 @@ fun TextFieldList(
 ) {
     val coroutineScope = rememberCoroutineScope()
     Column(
-        modifier = modifier.verticalScroll(scrollPosition),
+        modifier = modifier
+            .verticalScroll(scrollPosition)
+            .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         for (i in 0 until mutableList.size) {
@@ -40,6 +43,7 @@ fun TextFieldList(
                 title = title,
                 initialText = mutableList[i],
                 visible = mutableBooleanList[i].value,
+                enableDelete = numberOfTrueItems(mutableBooleanList) > 1,
                 updateText = { mutableList[i] = it },
                 deleteFunc = {
                     mutableBooleanList[i].value = false
@@ -68,4 +72,16 @@ fun TextFieldList(
             Text(text = mutableList[i] + " : " + mutableBooleanList[i].value)
         }*/
     }
+}
+
+private fun numberOfTrueItems(
+    mutableBooleanList: MutableList<MutableState<Boolean>>
+): Int {
+    var numberOfTrueItems = 0
+    for (i in 0 until mutableBooleanList.size) {
+        if (mutableBooleanList[i].value) {
+            numberOfTrueItems++
+        }
+    }
+    return numberOfTrueItems
 }

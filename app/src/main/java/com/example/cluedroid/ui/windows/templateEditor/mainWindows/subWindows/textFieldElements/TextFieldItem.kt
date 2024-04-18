@@ -42,6 +42,7 @@ internal fun TextFieldItem(
     title: String,
     initialText: String,
     visible: Boolean,
+    enableDelete: Boolean,
     updateText: (String) -> Unit,
     deleteFunc: () -> Unit,
 ) {
@@ -116,6 +117,7 @@ internal fun TextFieldItem(
             )
             Spacer(modifier = Modifier.width(10.dp))
             IconButton(
+                enabled = enableDelete,
                 onClick = {
                     coroutineScope.launch {
                         deleteFunc()

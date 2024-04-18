@@ -27,7 +27,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -41,12 +40,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cluedroid.R
@@ -100,9 +99,12 @@ private fun CluedroidGameMain(
     )
     val activeTemplate = activeTemplateViewModel.getActiveTemplateData()
     //Get template data
-    val suspects = template.suspects.trim().splitToSequence(stringResource(R.string.db_delimiter)).filter { it.isNotEmpty() }.toList()
-    val weapons = template.weapons.trim().splitToSequence(stringResource(R.string.db_delimiter)).filter { it.isNotEmpty() }.toList()
-    val rooms = template.rooms.trim().splitToSequence(stringResource(R.string.db_delimiter)).filter { it.isNotEmpty() }.toList()
+    val suspects = template.suspects.trim().splitToSequence(stringResource(R.string.db_delimiter))
+        .filter { it.isNotEmpty() }.toList()
+    val weapons = template.weapons.trim().splitToSequence(stringResource(R.string.db_delimiter))
+        .filter { it.isNotEmpty() }.toList()
+    val rooms = template.rooms.trim().splitToSequence(stringResource(R.string.db_delimiter))
+        .filter { it.isNotEmpty() }.toList()
     //Get active template data (marked/unmarked)
     val suspectsValues =
         activeTemplate.suspectsBooleans.trim().splitToSequence(", ").filter { it.isNotEmpty() }
@@ -193,19 +195,14 @@ private fun CluedroidGameMain(
 
         TabRow(
             selectedTabIndex = pagerState.currentPage,
-            indicator = {
-                TabRowDefaults.Indicator(
-                    Modifier.size(0.dp),
-                    color = Color.Transparent,
-                )
-            },
             modifier = Modifier
                 .weight(0.09f)
                 .fillMaxWidth(),
-            containerColor = MaterialTheme.colorScheme.primaryContainer
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+
         ) {
             repeat(tabTitles.size) {
-                Tab(text = { Text(tabTitles[it]) },
+                Tab(text = { Text(text = tabTitles[it], maxLines = 1, overflow = TextOverflow.Visible) },
                     icon = {
                         Icon(
                             painter = (if (pagerState.currentPage == it) tabIconsSelected[it]
@@ -214,7 +211,8 @@ private fun CluedroidGameMain(
                         )
                     },
                     selected = pagerState.currentPage == it,
-                    onClick = { coroutineScope.launch { pagerState.animateScrollToPage(it) } })
+                    onClick = { coroutineScope.launch { pagerState.animateScrollToPage(it) } }
+                )
             }
         }
     }
