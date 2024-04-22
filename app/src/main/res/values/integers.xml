@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="transition_duration_millis">400</integer>
+    <integer name="create_mode_default_number_of_suspects">6</integer>
+    <integer name="create_mode_default_number_of_weapons">6</integer>
+    <integer name="create_mode_default_number_of_rooms">9</integer>
 </resources>

@@ -9,6 +9,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.stringResource
 import com.example.cluedroid.R
 import com.example.cluedroid.db.TemplateRoomDatabase
@@ -44,10 +45,13 @@ fun TemplateEditorEditMode(
         mutableStateOf(template.name)
     }
     val suspectsList =
-        template.suspects.trim().splitToSequence(stringResource(R.string.db_delimiter)).filter { it.isNotEmpty() }.toList()
+        template.suspects.trim().splitToSequence(stringResource(R.string.db_delimiter))
+            .filter { it.isNotEmpty() }.toList()
     val weaponsList =
-        template.weapons.trim().splitToSequence(stringResource(R.string.db_delimiter)).filter { it.isNotEmpty() }.toList()
-    val roomsList = template.rooms.trim().splitToSequence(stringResource(R.string.db_delimiter)).filter { it.isNotEmpty() }.toList()
+        template.weapons.trim().splitToSequence(stringResource(R.string.db_delimiter))
+            .filter { it.isNotEmpty() }.toList()
+    val roomsList = template.rooms.trim().splitToSequence(stringResource(R.string.db_delimiter))
+        .filter { it.isNotEmpty() }.toList()
     //Suspects lists
     val suspectsMutableList = remember {
         suspectsList.toMutableStateList()
@@ -109,9 +113,12 @@ fun TemplateEditorCreateMode(
     var templateName by remember {
         mutableStateOf("")
     }
-    val suspectsList = listOf("")
-    val weaponsList = listOf("")
-    val roomsList = listOf("")
+    val suspectsList =
+        List(integerResource(id = R.integer.create_mode_default_number_of_suspects)) { "" }
+    val weaponsList =
+        List(integerResource(id = R.integer.create_mode_default_number_of_weapons)) { "" }
+    val roomsList =
+        List(integerResource(id = R.integer.create_mode_default_number_of_rooms)) { "" }
     //Suspects lists
     val suspectsMutableList = remember {
         suspectsList.toMutableStateList()

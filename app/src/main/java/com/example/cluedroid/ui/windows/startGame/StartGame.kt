@@ -162,7 +162,7 @@ private fun StartGameMain(
         Button(
             modifier = Modifier
                 .height(80.dp)
-                .width(230.dp),
+                .width(240.dp),
             onClick = navigateToSelectTemplate,
             shape = RoundedCornerShape(20.dp)
         ) {

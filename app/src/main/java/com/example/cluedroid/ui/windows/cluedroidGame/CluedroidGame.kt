@@ -199,10 +199,17 @@ private fun CluedroidGameMain(
                 .weight(0.09f)
                 .fillMaxWidth(),
             containerColor = MaterialTheme.colorScheme.primaryContainer,
-
         ) {
             repeat(tabTitles.size) {
-                Tab(text = { Text(text = tabTitles[it], maxLines = 1, overflow = TextOverflow.Visible) },
+                Tab(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = {
+                        Text(
+                            text = tabTitles[it],
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
                     icon = {
                         Icon(
                             painter = (if (pagerState.currentPage == it) tabIconsSelected[it]

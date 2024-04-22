@@ -31,6 +31,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.example.cluedroid.R
 import kotlinx.coroutines.launch
@@ -97,10 +98,17 @@ internal fun TextFieldItem(
                 },
                 trailingIcon = {
                     if ((text.isEmpty() || text.contains(stringResource(R.string.db_delimiter))) && isTyped) {
-                        Icon(Icons.Filled.Info, stringResource(R.string.error), tint = MaterialTheme.colorScheme.error)
+                        Icon(
+                            Icons.Filled.Info,
+                            stringResource(R.string.error),
+                            tint = MaterialTheme.colorScheme.error
+                        )
                     }
                 },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done,
+                    capitalization = KeyboardCapitalization.Words
+                ),
                 keyboardActions = KeyboardActions(
                     onDone = { keyboardController?.hide() }
                 ),
