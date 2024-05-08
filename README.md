@@ -13,6 +13,6 @@ Manage which suspects, weapons and rooms are suspicious and which ones you can d
 ## Download
 Find the latest release [here](https://github.com/TomasHBach/Cluedroid/releases/latest).
 
-##Credits
+## Credits
 - Programming & Design: [Tomás Herrera Bach](https://github.com/TomasHBach)
 - App Icon: Danna Colmenares
