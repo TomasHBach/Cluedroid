@@ -7,7 +7,8 @@ Manage which suspects, weapons and rooms are suspicious and which ones you can d
 
 ## Features
 - Cross out the suspects, weapons and rooms that you've ruled out
-- Add new templates, for different versions of Cluedo/Clue
+- Choose a template before starting a game to play different versions of Cluedo/Clue
+- Add new templates
 - Edit and delete existing templates
 - Light/Dark Theme
 
